@@ -1,0 +1,1140 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="gameday-staff-container">
+    <div class="header-section">
+        <h1>Gameday Staff Management</h1>
+        <h2>{{ game.home_team }} vs {{ game.away_team }}</h2>
+        <h3>{{ game.match_date|date:"l, F j, Y" }} at {{ game.match_date|time:"H:i" }}</h3>
+        
+        <div class="staffing-overview">
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h4>Total Staff Needed</h4>
+                    <span class="stat-number">{{ total_staff_needed }}</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Staff Assigned</h4>
+                    <span class="stat-number">{{ total_staff_assigned }}</span>
+                </div>
+                <div class="stat-card {% if total_vacancies > 0 %}stat-warning{% else %}stat-success{% endif %}">
+                    <h4>Vacancies</h4>
+                    <span class="stat-number">{{ total_vacancies }}</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Staffing Level</h4>
+                    <div class="progress">
+                        <div class="progress-bar {% if staffing_percentage < 70 %}bg-danger{% elif staffing_percentage < 90 %}bg-warning{% else %}bg-success{% endif %}"
+                             role="progressbar"
+                             style="width: {{ staffing_percentage }}%"
+                             aria-valuenow="{{ staffing_percentage }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">{{ staffing_percentage|floatformat:0 }}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vacancies Ticker -->
+    <div class="vacancies-ticker">
+        {% if jobs_with_vacancies %}
+            <h3>Positions to Fill:</h3>
+            <ul>
+                {% for item in jobs_with_vacancies %}
+                    <li id="vacancy-{{ item.job.id }}" class="vacancy-item">
+                        {{ item.job.job_name }} at {{ item.job.location }}: missing <span class="vacancy-count">{{ item.vacancies }}</span> people
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <h3 class="fully-staffed">All positions filled! 👍</h3>
+        {% endif %}
+    </div>
+
+    <!-- Jobs Section -->
+    <div class="jobs-section">
+        <div class="section-header">
+            <h2>Jobs</h2>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addJobModal">
+                <i class="fas fa-plus"></i> Add New Job
+            </button>
+        </div>
+
+        <!-- Job Listings -->
+        <div class="job-listings">
+            {% if jobs %}
+                {% for job in jobs %}
+                    <div class="job-card" id="job-{{ job.id }}">
+                        <div class="job-header">
+                            <h3>{{ job.job_name }} - {{ job.location }}</h3>
+                            <div class="job-actions">
+                                <button class="btn btn-sm btn-edit" data-toggle="modal" data-target="#editJobModal-{{ job.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-job-btn" data-job-id="{{ job.id }}" data-job-name="{{ job.job_name }}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="job-details">
+                            <div class="job-stats">
+                                <div class="stat">
+                                    <label>Staff needed:</label>
+                                    <span id="staff-needed-{{ job.id }}">{{ job.staff_needed }}</span>
+                                </div>
+                                <div class="stat">
+                                    <label>Staff assigned:</label>
+                                    <span id="staff-assigned-{{ job.id }}">{{ job.assigned_staff_count }}</span>
+                                </div>
+                                <div class="stat">
+                                    <label>Vacancies:</label>
+                                    <span id="vacancies-{{ job.id }}" class="{% if job.vacancies > 0 %}text-danger{% else %}text-success{% endif %}">
+                                        {{ job.vacancies }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="progress mb-3">
+                                {% with staffing_percent=job.assigned_staff_count|divisibleby:job.staff_needed|floatformat:0 %}
+                                <div class="progress-bar {% if staffing_percent < 70 %}bg-danger{% elif staffing_percent < 90 %}bg-warning{% else %}bg-success{% endif %}"
+                                     role="progressbar"
+                                     style="width: {{ staffing_percent }}%"
+                                     aria-valuenow="{{ staffing_percent }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">{{ staffing_percent }}%</div>
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <!-- Staff Assignments -->
+                        <div class="staff-assignments">
+                            <div class="staff-header">
+                                <h4>Assigned Staff</h4>
+                                <button class="btn btn-sm btn-success add-staff-btn" data-toggle="modal" data-target="#addStaffModal-{{ job.id }}">
+                                    <i class="fas fa-user-plus"></i> Add Staff
+                                </button>
+                            </div>
+
+                            <ul class="staff-list" id="staff-list-{{ job.id }}">
+                                {% for assignment in job.staff_assignments.all %}
+                                    <li id="assignment-{{ assignment.id }}" class="staff-item">
+                                        <div class="staff-info">
+                                            <strong>{{ assignment.person_name }}</strong>
+                                            {% if assignment.contact_info %}
+                                                <span class="contact-info">({{ assignment.contact_info }})</span>
+                                            {% endif %}
+                                            {% if assignment.notes %}
+                                                <span class="staff-notes">{{ assignment.notes }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="staff-actions">
+                                            <button class="btn btn-sm btn-outline-secondary edit-staff-btn"
+                                                    data-toggle="modal"
+                                                    data-target="#editStaffModal-{{ assignment.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger remove-staff-btn"
+                                                    data-assignment-id="{{ assignment.id }}"
+                                                    data-person-name="{{ assignment.person_name }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </li>
+                                {% empty %}
+                                    <li class="no-staff">No staff assigned yet</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <!-- Modal for adding staff to this job -->
+                        <div class="modal fade" id="addStaffModal-{{ job.id }}" tabindex="-1" role="dialog" aria-labelledby="addStaffModalLabel-{{ job.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addStaffModalLabel-{{ job.id }}">Add Staff to {{ job.job_name }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="add-staff-form-{{ job.id }}" method="POST" action="{% url 'assign_gameday_staff' game.id job.id %}" class="staff-form" data-job-id="{{ job.id }}">
+                                            {% csrf_token %}
+
+                                            <!-- Staff name with autocomplete -->
+                                            <div class="form-group">
+                                                <label for="id_person_name_{{ job.id }}">Name:</label>
+                                                <input type="text" name="person_name" id="id_person_name_{{ job.id }}" class="form-control staff-name-autocomplete" required>
+                                                <datalist id="staff-suggestions-{{ job.id }}"></datalist>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="id_contact_info_{{ job.id }}">Contact Information:</label>
+                                                <input type="text" name="contact_info" id="id_contact_info_{{ job.id }}" class="form-control staff-contact" placeholder="Phone or Email (Optional)">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="id_notes_{{ job.id }}">Notes:</label>
+                                                <textarea name="notes" id="id_notes_{{ job.id }}" class="form-control" rows="2" placeholder="Additional information (Optional)"></textarea>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-success">Add Staff Member</button>
+                                        </form>
+
+                                        <hr>
+
+                                        <!-- Quick add multiple staff -->
+                                        <div class="quick-add-section">
+                                            <h6>Quick Add Multiple Staff</h6>
+                                            <form id="quick-add-staff-form-{{ job.id }}" class="quick-staff-form" data-job-id="{{ job.id }}">
+                                                <div class="form-group">
+                                                    <textarea class="form-control" rows="4" id="quick-staff-list-{{ job.id }}" placeholder="Enter one name per line or Name: Contact"></textarea>
+                                                    <small class="form-text text-muted">Enter one staff member per line. You can optionally add contact info after a colon (e.g., "John Smith: 555-1234")</small>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Add Multiple Staff</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal for editing staff assignment -->
+                        {% for assignment in job.staff_assignments.all %}
+                        <div class="modal fade" id="editStaffModal-{{ assignment.id }}" tabindex="-1" role="dialog" aria-labelledby="editStaffModalLabel-{{ assignment.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editStaffModalLabel-{{ assignment.id }}">Edit Staff Assignment</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="edit-staff-form-{{ assignment.id }}" method="POST" action="{% url 'edit_gameday_staff' game.id assignment.id %}" class="edit-staff-form" data-assignment-id="{{ assignment.id }}">
+                                            {% csrf_token %}
+
+                                            <div class="form-group">
+                                                <label for="id_edit_person_name_{{ assignment.id }}">Name:</label>
+                                                <input type="text" name="person_name" id="id_edit_person_name_{{ assignment.id }}" class="form-control" value="{{ assignment.person_name }}" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="id_edit_contact_info_{{ assignment.id }}">Contact Information:</label>
+                                                <input type="text" name="contact_info" id="id_edit_contact_info_{{ assignment.id }}" class="form-control" value="{{ assignment.contact_info|default:'' }}">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="id_edit_notes_{{ assignment.id }}">Notes:</label>
+                                                <textarea name="notes" id="id_edit_notes_{{ assignment.id }}" class="form-control" rows="2">{{ assignment.notes|default:'' }}</textarea>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Modal for editing job -->
+                        <div class="modal fade" id="editJobModal-{{ job.id }}" tabindex="-1" role="dialog" aria-labelledby="editJobModalLabel-{{ job.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editJobModalLabel-{{ job.id }}">Edit Job</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="edit-job-form-{{ job.id }}" method="POST" action="{% url 'edit_gameday_job' game.id job.id %}" class="job-form" data-job-id="{{ job.id }}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="id_edit_job_name_{{ job.id }}">Job Name:</label>
+                                                <input type="text" name="job_name" id="id_edit_job_name_{{ job.id }}" class="form-control" value="{{ job.job_name }}" required>
+                                            </div>
+                                            <div class="form-group">
+<label for="id_edit_location_{{ job.id }}">Location:</label>
+                                                <input type="text" name="location" id="id_edit_location_{{ job.id }}" class="form-control" value="{{ job.location }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="id_edit_staff_needed_{{ job.id }}">Staff Needed:</label>
+                                                <input type="number" name="staff_needed" id="id_edit_staff_needed_{{ job.id }}" class="form-control" value="{{ job.staff_needed }}" min="1" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-jobs-message">
+                    <p>No jobs have been added yet. Add your first job to start planning gameday staff.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding a new job -->
+<div class="modal fade" id="addJobModal" tabindex="-1" role="dialog" aria-labelledby="addJobModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addJobModalLabel">Add New Job</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-job-form" method="POST" action="{% url 'add_gameday_job' game.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_job_name">Job Name:</label>
+                        {{ job_form.job_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_location">Location:</label>
+                        {{ job_form.location }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_staff_needed">Staff Needed:</label>
+                        {{ job_form.staff_needed }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Job</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal for Deletion -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this job: <span id="delete-job-name"></span>?</p>
+                <p class="text-danger">This will also remove all staff assignments for this job and cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-delete-btn" class="btn btn-danger">Delete Job</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Staff Suggestion Datalist -->
+<datalist id="staff-suggestions"></datalist>
+
+<!-- JavaScript for real-time updates -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle staff assignment submission via AJAX
+    const staffForms = document.querySelectorAll('.staff-form');
+    staffForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const jobId = this.getAttribute('data-job-id');
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update staff list
+                    const staffList = document.getElementById(`staff-list-${jobId}`);
+                    const noStaffItem = staffList.querySelector('.no-staff');
+                    if (noStaffItem) {
+                        noStaffItem.remove();
+                    }
+
+                    // Add new staff member
+                    const newItem = document.createElement('li');
+                    newItem.id = `assignment-${data.assignment_id}`;
+                    newItem.className = 'staff-item';
+                    newItem.innerHTML = `
+                        <div class="staff-info">
+                            <strong>${data.person_name}</strong>
+                            ${data.contact_info ? `<span class="contact-info">(${data.contact_info})</span>` : ''}
+                        </div>
+                        <div class="staff-actions">
+                            <button class="btn btn-sm btn-outline-secondary edit-staff-btn"
+                                    data-toggle="modal"
+                                    data-target="#editStaffModal-${data.assignment_id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger remove-staff-btn"
+                                    data-assignment-id="${data.assignment_id}"
+                                    data-person-name="${data.person_name}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    staffList.appendChild(newItem);
+
+                    // Update counts
+                    updateJobStats(jobId, data.vacancies, data.assigned_staff);
+
+                    // Close modal and clear form
+                    $(`#addStaffModal-${jobId}`).modal('hide');
+                    this.reset();
+                }
+            });
+        });
+    });
+
+    // Handle quick add staff form submission
+    const quickStaffForms = document.querySelectorAll('.quick-staff-form');
+    quickStaffForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const jobId = this.getAttribute('data-job-id');
+            const textArea = this.querySelector('textarea');
+            const staffList = textArea.value.trim().split('\n');
+
+            if (staffList.length === 0 || (staffList.length === 1 && staffList[0] === '')) {
+                alert('Please enter at least one staff member.');
+                return;
+            }
+
+            // Process each line and create staff assignments
+            let processedCount = 0;
+            const totalToProcess = staffList.length;
+
+            staffList.forEach(staffLine => {
+                if (!staffLine.trim()) return;
+
+                let personName, contactInfo = '';
+
+                // Check if line contains contact info
+                if (staffLine.includes(':')) {
+                    const parts = staffLine.split(':');
+                    personName = parts[0].trim();
+                    contactInfo = parts[1].trim();
+                } else {
+                    personName = staffLine.trim();
+                }
+
+                // Create form data for this staff member
+                const formData = new FormData();
+                formData.append('person_name', personName);
+                formData.append('contact_info', contactInfo);
+
+                // Add CSRF token
+                formData.append('csrfmiddlewaretoken', document.querySelector('input[name="csrfmiddlewaretoken"]').value);
+
+                // Send request
+                fetch(`/game/${game.id}/job/${jobId}/assign-staff/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    processedCount++;
+
+                    if (data.success) {
+                        // Add a visual indicator of success
+                        // Full update will happen when all staff are processed
+                    }
+
+                    // When all staff are processed, refresh the job card
+                    if (processedCount === totalToProcess) {
+                        // Reload the job card to reflect all changes
+                        loadJobStaff(jobId);
+
+                        // Close modal and clear form
+                        $(`#addStaffModal-${jobId}`).modal('hide');
+                        textArea.value = '';
+                    }
+                });
+            });
+        });
+    });
+
+    // Handle staff removal via AJAX
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-staff-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.remove-staff-btn');
+            const assignmentId = btn.getAttribute('data-assignment-id');
+            const personName = btn.getAttribute('data-person-name');
+
+            if (confirm(`Are you sure you want to remove ${personName}?`)) {
+                fetch(`/game/${game.id}/remove-staff/${assignmentId}/`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove staff item
+                        const staffItem = document.getElementById(`assignment-${assignmentId}`);
+                        const jobId = data.job_id;
+                        staffItem.remove();
+
+                        // Check if no staff left
+                        const staffList = document.getElementById(`staff-list-${jobId}`);
+                        if (staffList.children.length === 0) {
+                            const noStaff = document.createElement('li');
+                            noStaff.className = 'no-staff';
+                            noStaff.textContent = 'No staff assigned yet';
+                            staffList.appendChild(noStaff);
+                        }
+
+                        // Update counts
+                        updateJobStats(jobId, data.vacancies, data.assigned_staff);
+                    }
+                });
+            }
+        }
+    });
+
+    // Handle edit staff form submission
+    const editStaffForms = document.querySelectorAll('.edit-staff-form');
+    editStaffForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const assignmentId = this.getAttribute('data-assignment-id');
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update staff item with new information
+                    const staffItem = document.getElementById(`assignment-${assignmentId}`);
+                    const jobId = data.job_id;
+
+                    // Update the name and contact info
+                    const infoDiv = staffItem.querySelector('.staff-info');
+                    infoDiv.innerHTML = `
+                        <strong>${data.person_name}</strong>
+                        ${data.contact_info ? `<span class="contact-info">(${data.contact_info})</span>` : ''}
+                        ${data.notes ? `<span class="staff-notes">${data.notes}</span>` : ''}
+                    `;
+
+                    // Update data attributes for the remove button
+                    const removeBtn = staffItem.querySelector('.remove-staff-btn');
+                    removeBtn.setAttribute('data-person-name', data.person_name);
+
+                    // Close the modal
+                    $(`#editStaffModal-${assignmentId}`).modal('hide');
+                }
+            });
+        });
+    });
+
+    // Handle job form submission via AJAX
+    const jobForms = document.querySelectorAll('.job-form');
+    jobForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (this.id === 'add-job-form') {
+                        // This is a new job, reload the page to show it
+                        window.location.reload();
+                    } else {
+                        // Update job details without reloading
+                        const jobId = this.getAttribute('data-job-id');
+                        const jobCard = document.getElementById(`job-${jobId}`);
+
+                        // Update job header
+                        const jobHeader = jobCard.querySelector('.job-header h3');
+                        jobHeader.textContent = `${data.job_name} - ${data.location}`;
+
+                        // Update staff needed
+                        const staffNeededSpan = document.getElementById(`staff-needed-${jobId}`);
+                        staffNeededSpan.textContent = data.staff_needed;
+
+                        // Update vacancies
+                        updateJobStats(jobId, data.vacancies, data.assigned_staff);
+
+                        // Close modal
+                        $(`#editJobModal-${jobId}`).modal('hide');
+                    }
+                }
+            });
+        });
+    });
+
+    // Handle job deletion (with confirmation)
+    const deleteJobBtns = document.querySelectorAll('.delete-job-btn');
+    deleteJobBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const jobId = this.getAttribute('data-job-id');
+            const jobName = this.getAttribute('data-job-name');
+
+            // Set up confirmation modal
+            document.getElementById('delete-job-name').textContent = jobName;
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            confirmBtn.href = `/game/${game.id}/job/${jobId}/delete/`;
+            confirmBtn.setAttribute('data-job-id', jobId);
+
+            // Show confirmation modal
+            $('#confirmDeleteModal').modal('show');
+        });
+    });
+
+    // Handle confirmed deletion
+    document.getElementById('confirm-delete-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const jobId = this.getAttribute('data-job-id');
+
+        fetch(this.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+// Remove job card
+                const jobCard = document.getElementById(`job-${jobId}`);
+                jobCard.remove();
+
+                // Update vacancies ticker
+                updateVacancyTicker();
+
+                // Update total stats
+                updateTotalStats();
+
+                // Close modal
+                $('#confirmDeleteModal').modal('hide');
+
+                // If no jobs left, show no-jobs message
+                const jobListings = document.querySelector('.job-listings');
+                if (jobListings.children.length === 0) {
+                    const noJobsMsg = document.createElement('div');
+                    noJobsMsg.className = 'no-jobs-message';
+                    noJobsMsg.innerHTML = '<p>No jobs have been added yet. Add your first job to start planning gameday staff.</p>';
+                    jobListings.appendChild(noJobsMsg);
+                }
+            }
+        });
+    });
+
+    // Function to update job statistics
+    function updateJobStats(jobId, vacancies, assignedStaff) {
+        const staffAssigned = document.getElementById(`staff-assigned-${jobId}`);
+        const vacanciesElem = document.getElementById(`vacancies-${jobId}`);
+        const staffNeeded = document.getElementById(`staff-needed-${jobId}`);
+
+        staffAssigned.textContent = assignedStaff;
+        vacanciesElem.textContent = vacancies;
+
+        if (vacancies > 0) {
+            vacanciesElem.classList.add('text-danger');
+            vacanciesElem.classList.remove('text-success');
+        } else {
+            vacanciesElem.classList.add('text-success');
+            vacanciesElem.classList.remove('text-danger');
+        }
+
+        // Update progress bar
+        const progressBar = document.querySelector(`#job-${jobId} .progress-bar`);
+        const staffNeededValue = parseInt(staffNeeded.textContent);
+        const staffingPercent = staffNeededValue > 0 ? Math.round((assignedStaff / staffNeededValue) * 100) : 0;
+
+        progressBar.style.width = `${staffingPercent}%`;
+        progressBar.setAttribute('aria-valuenow', staffingPercent);
+        progressBar.textContent = `${staffingPercent}%`;
+
+        if (staffingPercent < 70) {
+            progressBar.className = 'progress-bar bg-danger';
+        } else if (staffingPercent < 90) {
+            progressBar.className = 'progress-bar bg-warning';
+        } else {
+            progressBar.className = 'progress-bar bg-success';
+        }
+
+        // Update vacancy ticker
+        updateVacancyTicker();
+
+        // Update total stats
+        updateTotalStats();
+    }
+
+    // Update the vacancy ticker
+    function updateVacancyTicker() {
+        const vacancyItems = document.querySelectorAll('.vacancy-item');
+        const tickerContainer = document.querySelector('.vacancies-ticker');
+
+        // Check all jobs for vacancies
+        let hasVacancies = false;
+        let vacanciesList = [];
+
+        document.querySelectorAll('[id^="vacancies-"]').forEach(elem => {
+            const jobId = elem.id.split('-')[1];
+            const vacancies = parseInt(elem.textContent);
+
+            if (vacancies > 0) {
+                hasVacancies = true;
+                const jobName = document.querySelector(`#job-${jobId} .job-header h3`).textContent;
+                vacanciesList.push({
+                    id: jobId,
+                    name: jobName,
+                    vacancies: vacancies
+                });
+            }
+        });
+
+        // Update ticker
+        if (hasVacancies) {
+            let html = '<h3>Positions to Fill:</h3><ul>';
+
+            vacanciesList.forEach(job => {
+                html += `<li id="vacancy-${job.id}" class="vacancy-item">
+                    ${job.name}: missing <span class="vacancy-count">${job.vacancies}</span> ${job.vacancies === 1 ? 'person' : 'people'}
+                </li>`;
+            });
+
+            html += '</ul>';
+            tickerContainer.innerHTML = html;
+        } else {
+            tickerContainer.innerHTML = '<h3 class="fully-staffed">All positions filled! 👍</h3>';
+        }
+    }
+
+    // Update total stats
+    function updateTotalStats() {
+        let totalNeeded = 0;
+        let totalAssigned = 0;
+
+        document.querySelectorAll('[id^="staff-needed-"]').forEach(elem => {
+            totalNeeded += parseInt(elem.textContent);
+        });
+
+        document.querySelectorAll('[id^="staff-assigned-"]').forEach(elem => {
+            totalAssigned += parseInt(elem.textContent);
+        });
+
+        const totalVacancies = totalNeeded - totalAssigned;
+        const staffingPercentage = totalNeeded > 0 ? Math.round((totalAssigned / totalNeeded) * 100) : 0;
+
+        // Update the stat cards
+        const statsCards = document.querySelector('.stats-cards');
+        if (statsCards) {
+            const statNumbers = statsCards.querySelectorAll('.stat-number');
+            if (statNumbers.length >= 3) {
+                statNumbers[0].textContent = totalNeeded;
+                statNumbers[1].textContent = totalAssigned;
+                statNumbers[2].textContent = totalVacancies;
+            }
+
+            const progressBar = statsCards.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${staffingPercentage}%`;
+                progressBar.setAttribute('aria-valuenow', staffingPercentage);
+                progressBar.textContent = `${staffingPercentage}%`;
+
+                if (staffingPercentage < 70) {
+                    progressBar.className = 'progress-bar bg-danger';
+                } else if (staffingPercentage < 90) {
+                    progressBar.className = 'progress-bar bg-warning';
+                } else {
+                    progressBar.className = 'progress-bar bg-success';
+                }
+            }
+        }
+    }
+
+    // Staff name autocomplete
+    const staffNameInputs = document.querySelectorAll('.staff-name-autocomplete');
+    staffNameInputs.forEach(input => {
+        input.addEventListener('input', debounce(function() {
+            const query = this.value.trim();
+            if (query.length < 2) return;
+
+            fetch(`/game/${game.id}/staff-search/?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Get the datalist for this input
+                const jobId = this.closest('form').getAttribute('data-job-id');
+                const datalist = document.getElementById(`staff-suggestions-${jobId}`);
+
+                // Clear existing options
+                datalist.innerHTML = '';
+
+                // Add new options from search results
+                data.results.forEach(staff => {
+                    const option = document.createElement('option');
+                    option.value = staff.person_name;
+                    option.setAttribute('data-contact', staff.contact_info || '');
+                    datalist.appendChild(option);
+                });
+
+                // Add a handler for selection to autofill contact info
+                this.addEventListener('change', function() {
+                    const selected = Array.from(datalist.options).find(opt => opt.value === this.value);
+                    if (selected) {
+                        const contactInfo = selected.getAttribute('data-contact');
+                        const contactInput = this.closest('form').querySelector('.staff-contact');
+                        if (contactInput && contactInfo) {
+                            contactInput.value = contactInfo;
+                        }
+                    }
+                });
+            });
+        }, 300));
+    });
+
+    // Helper function to load job staff details
+    function loadJobStaff(jobId) {
+        fetch(`/game/${game.id}/job/${jobId}/staff/`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update staff list
+            const staffList = document.getElementById(`staff-list-${jobId}`);
+            staffList.innerHTML = '';
+
+            if (data.staff.length === 0) {
+                const noStaff = document.createElement('li');
+                noStaff.className = 'no-staff';
+                noStaff.textContent = 'No staff assigned yet';
+                staffList.appendChild(noStaff);
+            } else {
+                data.staff.forEach(member => {
+                    const item = document.createElement('li');
+                    item.id = `assignment-${member.id}`;
+                    item.className = 'staff-item';
+                    item.innerHTML = `
+                        <div class="staff-info">
+                            <strong>${member.name}</strong>
+                            ${member.contact_info ? `<span class="contact-info">(${member.contact_info})</span>` : ''}
+                            ${member.notes ? `<span class="staff-notes">${member.notes}</span>` : ''}
+                        </div>
+                        <div class="staff-actions">
+                            <button class="btn btn-sm btn-outline-secondary edit-staff-btn"
+                                    data-toggle="modal"
+                                    data-target="#editStaffModal-${member.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger remove-staff-btn"
+                                    data-assignment-id="${member.id}"
+                                    data-person-name="${member.name}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    staffList.appendChild(item);
+                });
+            }
+
+            // Update job stats
+            updateJobStats(jobId, data.vacancies, data.staff.length);
+        });
+    }
+
+    // Debounce helper function for search inputs
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+});
+</script>
+
+<!-- Additional CSS for Gameday Staff page -->
+<style>
+.gameday-staff-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.stats-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 200px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 0 10px 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-card h4 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #6c757d;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #212529;
+}
+
+.stat-warning .stat-number {
+    color: #ffc107;
+}
+
+.stat-success .stat-number {
+    color: #28a745;
+}
+
+.vacancies-ticker {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 30px;
+}
+
+.vacancies-ticker h3 {
+    color: #721c24;
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.fully-staffed {
+    color: #155724 !important;
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+}
+
+.vacancy-item {
+    margin-bottom: 5px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.job-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #f1f3f5;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.job-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.job-details {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.job-stats {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.stat {
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.stat label {
+    display: block;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 3px;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.text-success {
+    color: #28a745;
+}
+
+.staff-assignments {
+    padding: 15px;
+}
+
+.staff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.staff-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.staff-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.staff-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.staff-item:last-child {
+    border-bottom: none;
+}
+
+.staff-info {
+    flex: 1;
+}
+
+.contact-info {
+    color: #6c757d;
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.staff-notes {
+    display: block;
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 3px;
+}
+
+.staff-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.no-staff {
+    color: #6c757d;
+    font-style: italic;
+    padding: 10px 0;
+}
+
+.quick-add-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+.no-jobs-message {
+    text-align: center;
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.progress {
+    height: 10px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+}
+
+
+.progress-bar {
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .stats-cards {
+        flex-direction: column;
+    }
+
+    .stat-card {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .job-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .job-actions {
+        margin-top: 10px;
+    }
+
+    .staff-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .staff-actions {
+        margin-top: 8px;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+</style>
+{% endblock %}

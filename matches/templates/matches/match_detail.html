@@ -1,0 +1,372 @@
+{% extends "matches/base.html" %}
+
+{% block title %}{{ match.home_team.name }} vs {{ match.away_team.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <a href="{% url 'tournament_detail' match.tournament.tournament_number %}" class="text-decoration-none">
+            <i class="fas fa-arrow-left me-2"></i>Back to calendar{{ match.tournament.name }}
+        </a>
+    </div>
+
+    <!-- Gameday Staff Management Section (Added from game_details.html) -->
+    <div class="gameday-staff-section">
+        <h3>Gameday Staff Management</h3>
+
+        {% if staff_jobs_count > 0 %}
+            <div class="staff-summary">
+                <p>
+                    <strong>{{ staff_jobs_count }}</strong> job positions defined
+                    {% if staff_vacancies > 0 %}
+                        <span class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>{{ staff_vacancies }}</strong> positions still need to be filled!
+                        </span>
+                    {% else %}
+                        <span class="text-success">
+                            <i class="fas fa-check-circle"></i>
+                            All positions filled!
+                        </span>
+                    {% endif %}
+                </p>
+
+                {% if staff_vacancies > 0 %}
+                    <div class="progress" style="height: 10px; margin-bottom: 15px;">
+                        <div class="progress-bar bg-danger" role="progressbar"
+                             style="width: {{ staffing_percentage }}%;"
+                             aria-valuenow="{{ staffing_percentage }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ staffing_percentage }}%
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>No gameday staff jobs have been defined yet. Start planning your event staff!</p>
+        {% endif %}
+
+        <div class="action-buttons">
+    <a href="/game/{{ match.match_number }}/staff/" class="btn btn-primary">
+                <i class="fas fa-users-cog"></i> Manage Gameday Staff
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-center">
+            <h5 class="mb-0">{{ match.tournament.name }}</h5>
+            <div class="text-white-50">{{ match.match_date|date:"l, d F Y H:i" }}</div>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center text-center">
+                <div class="col-5">
+                  <a href="{% url 'team_detail' match.home_team.team_number %}" class="text-decoration-none">
+                        <h3 class="mb-2">{{ match.home_team.name }}</h3>
+                    </a>
+                </div>
+                <div class="col-2">
+                    {% if match.home_score is not None and match.away_score is not None %}
+                        <div class="display-4 fw-bold">
+                            {{ match.home_score }} - {{ match.away_score }}
+                        </div>
+                        <div class="small text-muted">FINAL</div>
+                    {% else %}
+                        <div class="h4 text-muted">vs</div>
+                    {% endif %}
+                </div>
+                <div class="col-5">
+                    <a href="{% url 'team_detail' match.away_team.team_number %}" class="text-decoration-none">
+                        <h3 class="mb-2">{{ match.away_team.name }}</h3>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-around">
+            <div>
+                <i class="fas fa-map-marker-alt me-1"></i>
+                <span>{{ match.stadium_name }}</span>
+            </div>
+            {% if match.attendance %}
+            <div>
+                <i class="fas fa-users me-1"></i>
+                <span>{{ match.attendance }} spectators</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Goal Song Section (Added from game_details.html) -->
+    <div class="goal-song-section">
+        {% if match.get_goal_song %}
+            <h3>{{ match.home_team.name }} Goal Song</h3>
+            <button id="goal-song-button" class="btn">
+                <span id="goal-icon">🔈</span> Play Goal Song
+            </button>
+            <audio id="goal-song-audio" src="{{ match.get_goal_song }}" preload="auto"></audio>
+        {% endif %}
+    </div>
+
+    <!-- Player Lineup Visualization (Added from game_details.html) -->
+    <div class="lineup-container">
+        <div class="team-headers">
+            <div class="home-header">
+                <h3>{{ match.home_team.name }} <span class="formation-badge">{{ home_formation }}</span></h3>
+            </div>
+            <div class="away-header">
+                <h3>{{ match.away_team.name }} <span class="formation-badge">{{ away_formation }}</span></h3>
+            </div>
+        </div>
+
+        <div class="pitch">
+            <div class="pitch-markings">
+                <div class="halfway-line"></div>
+                <div class="center-circle"></div>
+                <div class="penalty-area home"></div>
+                <div class="goal-area home"></div>
+                <div class="penalty-area away"></div>
+                <div class="goal-area away"></div>
+            </div>
+
+            {% for player in home_lineup %}
+                {% if forloop.counter <= 11 %}
+                    <div class="player-card home position-{{ player.position }}" id="home-player-{{ forloop.counter }}">
+                        {% if player.player %}
+                            <div class="player-number">{{ player.player.shirt_number|default:forloop.counter }}</div>
+                            <div class="player-name">{{ player.player.last_name }}</div>
+                        {% else %}
+                            <div class="player-number">{{ forloop.counter }}</div>
+                            <div class="player-name empty">-</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% for player in away_lineup %}
+                {% if forloop.counter <= 11 %}
+                    <div class="player-card away position-{{ player.position }}" id="away-player-{{ forloop.counter }}">
+                        {% if player.player %}
+                            <div class="player-number">{{ player.player.shirt_number|default:forloop.counter }}</div>
+                            <div class="player-name">{{ player.player.last_name }}</div>
+                        {% else %}
+                            <div class="player-number">{{ forloop.counter }}</div>
+                            <div class="player-name empty">-</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if events %}
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <h2 class="h5 mb-0">Match Events</h2>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Player</th>
+                            <th>Team</th>
+                            <th>Event</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                        <tr>
+                            <td class="align-middle">{{ event.minute }}'</td>
+                            <td class="align-middle">
+                                <a href="{% url 'player_detail' event.player.player_number %}" class="text-decoration-none">
+                                    {{ event.player.name }}
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                <a href="{% url 'team_detail' event.player.team.team_number %}" class="text-decoration-none">
+                                    {{ event.player.team.name }}
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                {% if "goal" in event.event_type|lower %}
+                                    <span class="badge bg-success">⚽ Goal</span>
+                                {% elif "yellow" in event.event_type|lower %}
+                                    <span class="badge bg-warning text-dark">🟨 Yellow Card</span>
+                                {% elif "red" in event.event_type|lower %}
+                                    <span class="badge bg-danger">🟥 Red Card</span>
+                                {% elif "own goal" in event.event_type|lower %}
+                                    <span class="badge bg-secondary">⚽ Own Goal</span>
+                                {% elif "substit" in event.event_type|lower %}
+                                    <span class="badge bg-info text-dark">🔄 Substitution</span>
+                                {% elif "penalty" in event.event_type|lower %}
+                                    <span class="badge bg-primary">⚽ Penalty</span>
+                                {% else %}
+                                    <span class="badge bg-dark">{{ event.event_type }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Leikurinn hefur ekki verið spilaður. Leikurinn byrjar þann {{ match.match_date }} :)
+    </div>
+    {% endif %}
+
+    <!-- CSS and JavaScript for Gameday Staff and Pitch Visualization (Added from game_details.html) -->
+    <style>
+    .gameday-staff-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .gameday-staff-section h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #343a40;
+    }
+
+    .staff-summary {
+        margin-bottom: 15px;
+    }
+
+    .action-buttons {
+        margin-top: 15px;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .text-success {
+        color: #28a745;
+    }
+
+    /* Make team names black */
+    .card-body .row .col-5 h3 {
+        color: black !important;
+    }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Goal song functionality
+            const goalButton = document.getElementById('goal-song-button');
+            const goalAudio = document.getElementById('goal-song-audio');
+            const goalIcon = document.getElementById('goal-icon');
+
+            if (goalButton && goalAudio && goalIcon) {
+                let isPlaying = false;
+
+                goalButton.addEventListener('click', function() {
+                    if (!isPlaying) {
+                        // Start playing
+                        goalAudio.play();
+                        goalIcon.textContent = '🔊';
+                        goalButton.textContent = goalButton.textContent.replace('Play', 'Stop');
+                        isPlaying = true;
+                    } else {
+                        // Stop playing
+                        goalAudio.pause();
+
+                        // If we click again, reset to beginning
+                        if (goalAudio.currentTime > 0) {
+                            goalAudio.currentTime = 0;
+                            goalIcon.textContent = '🔈';
+                            goalButton.textContent = goalButton.textContent.replace('Stop', 'Play');
+                            isPlaying = false;
+                        }
+                    }
+                });
+
+                // When audio ends naturally
+                goalAudio.addEventListener('ended', function() {
+                    goalIcon.textContent = '🔈';
+                    goalButton.textContent = goalButton.textContent.replace('Stop', 'Play');
+                    isPlaying = false;
+                });
+            }
+
+            // Position players based on formation
+            positionPlayers("{{ home_formation }}", "home");
+            positionPlayers("{{ away_formation }}", "away");
+        });
+
+        function positionPlayers(formation, team) {
+            const positions = calculatePositions(formation, team);
+
+            for (let i = 1; i <= 11; i++) {
+                const playerElem = document.getElementById(`${team}-player-${i}`);
+                if (playerElem && positions[i]) {
+                    playerElem.style.left = positions[i].x + '%';
+                    playerElem.style.top = positions[i].y + '%';
+                }
+            }
+        }
+
+function calculatePositions(formation, team) {
+    const positions = {};
+    const parts = formation.split('-');
+
+    // Process formations like 4-4-2, 4-3-3, etc.
+    let totalPlayers = 0;
+    const lines = [];
+
+    // Goalkeeper is always position 1
+    positions[1] = team === 'home' ? { x: 0, y: 46 } : { x: 90, y: 46 };
+    totalPlayers = 1;
+
+    // Add each line from the formation
+    for (let i = 0; i < parts.length; i++) {
+        const count = parseInt(parts[i]);
+        lines.push({ count, startPos: totalPlayers + 1 });
+        totalPlayers += count;
+    }
+
+    // Calculate positions for each line - with better spacing to keep players in their own half
+    lines.forEach((line, idx) => {
+        // Adjusted to keep players better in their own half
+        // Home team positions are in the 5% to 45% range, away team in 55% to 95% range
+        let xRange;
+        if (team === 'home') {
+            xRange = 45; // From 5% to 45%
+            const depth = 5 + (idx + 1) * (xRange / (lines.length + 1));
+            const xPos = depth;
+
+            for (let i = 0; i < line.count; i++) {
+                const spacing = 80 / (line.count + 1);
+                const yPos = (i + 1) * spacing + 10;
+                positions[line.startPos + i] = { x: xPos, y: yPos };
+            }
+        } else {
+            xRange = 45; // From 55% to 95%
+            const depth = (idx + 1) * (xRange / (lines.length + 1));
+            const xPos = 90 - depth;
+
+            for (let i = 0; i < line.count; i++) {
+                const spacing = 80 / (line.count + 1);
+                const yPos = (i + 1) * spacing + 10;
+                positions[line.startPos + i] = { x: xPos, y: yPos };
+            }
+        }
+    });
+
+    return positions;
+}
+
+function playGoalSong() {
+    var audio = document.getElementById("goalSong");
+    audio.play();
+}
+    </script>
+    </div>
+{% endblock %}

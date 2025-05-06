@@ -1,0 +1,111 @@
+{% extends 'predictions/base.html' %}
+
+{% block content %}
+<div class="prediction-detail-container">
+    <div class="prediction-header">
+        <h1>Match Prediction</h1>
+        <a href="{% url 'predictions_home' %}" class="btn btn-secondary">Back to Predictions</a>
+    </div>
+
+    <div class="match-card">
+        <div class="match-teams">
+            <div class="team home-team">
+                {% if prediction.game.home_team.logo %}
+                <img src="{{ prediction.game.home_team.logo.url }}" alt="{{ prediction.game.home_team.name }}" class="team-logo">
+                {% endif %}
+                <h2>{{ prediction.game.home_team.name }}</h2>
+            </div>
+
+            <div class="vs-container">
+                <span class="vs">vs</span>
+                <div class="match-date">{{ prediction.game.match_date|date:"l, F j, Y" }}</div>
+                <div class="match-time">{{ prediction.game.match_date|time:"H:i" }}</div>
+            </div>
+
+            <div class="team away-team">
+                {% if prediction.game.away_team.logo %}
+                <img src="{{ prediction.game.away_team.logo.url }}" alt="{{ prediction.game.away_team.name }}" class="team-logo">
+                {% endif %}
+                <h2>{{ prediction.game.away_team.name }}</h2>
+            </div>
+        </div>
+
+        <div class="prediction-result">
+            <h3>Prediction Result</h3>
+
+            <div class="result-container">
+                <div class="probabilities">
+                    <div class="probability-bar">
+                        <div class="probability-segment home-win"
+                             style="width: {{ prediction.home_win_probability|floatformat:0 }}%;"
+                             title="Home win: {{ prediction.home_win_probability|floatformat:1 }}%">
+                            <span class="probability-label">{{ prediction.home_win_probability|floatformat:0 }}%</span>
+                        </div>
+                        <div class="probability-segment draw"
+                             style="width: {{ prediction.draw_probability|floatformat:0 }}%;"
+                             title="Draw: {{ prediction.draw_probability|floatformat:1 }}%">
+                            <span class="probability-label">{{ prediction.draw_probability|floatformat:0 }}%</span>
+                        </div>
+                        <div class="probability-segment away-win"
+                             style="width: {{ prediction.away_win_probability|floatformat:0 }}%;"
+                             title="Away win: {{ prediction.away_win_probability|floatformat:1 }}%">
+                            <span class="probability-label">{{ prediction.away_win_probability|floatformat:0 }}%</span>
+                        </div>
+                    </div>
+                    <div class="probability-labels">
+                        <span class="home-win-label">Home Win</span>
+                        <span class="draw-label">Draw</span>
+                        <span class="away-win-label">Away Win</span>
+                    </div>
+                </div>
+
+                <div class="predicted-score">
+                    <h4>Predicted Score</h4>
+                    <div class="score">
+                        <span class="home-score">{{ prediction.predicted_home_goals|floatformat:1 }}</span>
+                        <span class="score-separator">-</span>
+                        <span class="away-score">{{ prediction.predicted_away_goals|floatformat:1 }}</span>
+                    </div>
+                    <div class="most-likely">
+                        Most likely: <strong>{{ prediction.prediction_result }}</strong>
+                    </div>
+                </div>
+
+                {% if actual_result %}
+                <div class="actual-result {% if actual_result == prediction.prediction_result %}correct{% else %}incorrect{% endif %}">
+                    <h4>Actual Result</h4>
+                    <div class="result">{{ actual_result }}</div>
+                    <div class="score">
+                        {{ prediction.game.home_goals }} - {{ prediction.game.away_goals }}
+                    </div>
+                    <div class="prediction-accuracy">
+                        Prediction was <strong>{% if actual_result == prediction.prediction_result %}CORRECT{% else %}INCORRECT{% endif %}</strong>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="prediction-meta">
+            <div class="model-info">
+                <h4>Prediction Model</h4>
+                <div class="model-name">{{ prediction.model.name }}</div>
+                <div class="model-type">{{ prediction.model.get_model_type_display }}</div>
+                <div class="model-accuracy">Model accuracy: {{ prediction.model.accuracy|floatformat:2 }}</div>
+                {% if user.is_staff %}
+                <a href="{% url 'model_detail' prediction.model.id %}" class="btn btn-sm btn-info">View Model</a>
+                {% endif %}
+            </div>
+
+            <div class="prediction-info">
+                <div class="prediction-date">Prediction made on {{ prediction.created_at|date:"M d, Y" }} at {{ prediction.created_at|time:"H:i" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'game_details' prediction.game.id %}" class="btn btn-primary">View Game Details</a>
+        <a href="{% url 'new_prediction' %}" class="btn btn-secondary">New Prediction</a>
+    </div>
+</div>
+{% endblock %}

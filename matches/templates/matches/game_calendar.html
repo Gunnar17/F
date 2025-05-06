@@ -1,0 +1,200 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="calendar-header">
+    <h2>Match Calendar - {{ month_name }} {{ year }}</h2>
+    <div class="filter-controls">
+        <a href="{% url 'game_calendar' %}?month={{ month }}&year={{ year }}" class="btn {% if not league %}btn-active{% endif %}">All Leagues</a>
+        <a href="{% url 'game_calendar' %}?month={{ month }}&year={{ year }}&league=men" class="btn {% if league == 'men' %}btn-active{% endif %}">Men's Leagues</a>
+        <a href="{% url 'game_calendar' %}?month={{ month }}&year={{ year }}&league=women" class="btn {% if league == 'women' %}btn-active{% endif %}">Women's Leagues</a>
+    </div>
+</div>
+
+<div class="month-navigation">
+    <a href="{% url 'game_calendar' %}?month={{ month|add:"-1" }}&year={% if month == 1 %}{{ year|add:"-1" }}{% else %}{{ year }}{% endif %}{% if league %}&league={{ league }}{% endif %}" class="btn btn-month">Previous Month</a>
+    <span class="current-month">{{ month_name }} {{ year }}</span>
+    <a href="{% url 'game_calendar' %}?month={{ month|add:"1" }}&year={% if month == 12 %}{{ year|add:"1" }}{% else %}{{ year }}{% endif %}{% if league %}&league={{ league }}{% endif %}" class="btn btn-month">Next Month</a>
+</div>
+
+<table id="calendarTable" class="full-calendar">
+    <tr>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+        <th>Sunday</th>
+    </tr>
+    {% for week in days %}
+    <tr>
+        {% for day in week %}
+        <td {% if day and day.matches or day.ksi_matches %}class="has-matches"{% endif %}>
+        {% if day %}
+            <div class="day-header">
+                <strong>{{ day.date|date:"d" }}</strong>
+                {% if day.matches|length > 0 or day.ksi_matches|length > 0 %}
+                    <span class="match-count">
+                        {{ day.matches|length|add:day.ksi_matches|length }} matches
+                    </span>
+                {% endif %}
+            </div>
+
+{% if day.matches or day.ksi_matches %}
+    <div class="matches-preview">
+        {% with total_matches=day.matches|length|add:day.ksi_matches|length %}
+            {% if total_matches <= 3 %}
+                {% for match in day.matches %}
+                    <div class="match-preview">
+                        {% if match.home_team.logo %}
+                            <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team.name }}" class="team-logo-small">
+                        {% else %}
+                            <span class="team-name">{{ match.home_team.name }}</span>
+                        {% endif %}
+                        <span class="vs-small">vs</span>
+                        {% if match.away_team.logo %}
+                            <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team.name }}" class="team-logo-small">
+                        {% else %}
+                            <span class="team-name">{{ match.away_team.name }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% for match in day.ksi_matches %}
+                    <div class="match-preview">
+                        {% if match.home_team.logo %}
+                            <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team.name }}" class="team-logo-small">
+                        {% else %}
+                            <span class="team-name">{{ match.home_team.name }}</span>
+                        {% endif %}
+                        <span class="vs-small">vs</span>
+                        {% if match.away_team.logo %}
+                            <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team.name }}" class="team-logo-small">
+                        {% else %}
+                            <span class="team-name">{{ match.away_team.name }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="match-preview">
+                    {% if day.matches.0.home_team.logo %}
+                        <img src="{{ day.matches.0.home_team.logo.url }}" alt="{{ day.matches.0.home_team.name }}" class="team-logo-small">
+                    {% else %}
+                        <span class="team-name">{{ day.matches.0.home_team.name }}</span>
+                    {% endif %}
+                    <span class="vs-small">vs</span>
+                    {% if day.matches.0.away_team.logo %}
+                        <img src="{{ day.matches.0.away_team.logo.url }}" alt="{{ day.matches.0.away_team.name }}" class="team-logo-small">
+                    {% else %}
+                        <span class="team-name">{{ day.matches.0.away_team.name }}</span>
+                    {% endif %}
+                </div>
+                <div class="match-preview">
+                    <span>... and {{ total_matches|add:"-1" }} more</span>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+{% else %}
+    <p class="no-matches">No matches</p>
+{% endif %}        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Modal for day matches -->
+<div id="matchesModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modal-title">Matches for <span id="modal-date"></span></h3>
+        <div id="modal-matches"></div>
+    </div>
+</div>
+
+<script>
+    // Modal handling
+    const modal = document.getElementById('matchesModal');
+    const closeBtn = document.getElementsByClassName('close')[0];
+    const viewLinks = document.getElementsByClassName('view-day-matches');
+
+    // Close modal when clicking X
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Open modal with day's matches
+    Array.from(viewLinks).forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const date = this.getAttribute('data-date');
+
+            // Set modal title
+            document.getElementById('modal-date').textContent = new Date(date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Fetch matches for this day
+            fetch(`/api/day-matches/?date=${date}{% if league %}&league={{ league }}{% endif %}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('modal-matches');
+
+                    if (data.matches.length === 0) {
+                        container.innerHTML = '<p>No matches scheduled for this day.</p>';
+                        return;
+                    }
+
+                    let html = '<div class="modal-match-list">';
+
+                    data.matches.forEach(match => {
+                        html += `
+                            <div class="match-card">
+                                <div class="match-teams">
+                                    <div class="team">
+                                        ${match.home_team_logo ?
+                                            `<img src="${match.home_team_logo}" alt="${match.home_team}" class="team-logo">` : ''}
+                                        <span>${match.home_team}</span>
+                                    </div>
+                                    <div class="match-info">
+                                        <span class="match-time">${match.time}</span>
+                                        <span class="vs">vs</span>
+                                    </div>
+                                    <div class="team">
+                                        ${match.away_team_logo ?
+                                            `<img src="${match.away_team_logo}" alt="${match.away_team}" class="team-logo">` : ''}
+                                        <span>${match.away_team}</span>
+                                    </div>
+                                </div>
+                                <div class="match-details">
+                                    <span class="tournament">${match.tournament || "Match"}</span>
+                                    <a href="${match.details_url}" class="match-link">View Details</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += '</div>';
+                    container.innerHTML = html;
+                })
+                .catch(error => {
+                    document.getElementById('modal-matches').innerHTML =
+                        '<p>Error loading matches. Please try again later.</p>';
+                    console.error('Error:', error);
+                });
+
+            modal.style.display = "block";
+        });
+    });
+</script>
+{% endblock %}

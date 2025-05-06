@@ -1,0 +1,47 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>{{ team.name }}</h2>
+<img src="{{ team.logo.url }}" alt="{{ team.name }} logo" class="team-logo">
+<div class="team-info"> <p><strong>Category:</strong> {{ team.category|capfirst }}</p> <p><strong>Team Description:</strong> {{ team.description }}</p> <!-- You can add other fields like players, previous lineups, etc. --> </div>
+
+<h3>Players</h3>
+<div class="player-list">
+    <h4>Goalkeepers</h4>
+    <ul>
+        {% for player in players %}
+            {% if player.position == "GK" %}
+                <li>{{ player.first_name }} {{ player.last_name }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <h4>Defenders</h4>
+    <ul>
+        {% for player in players %}
+            {% if player.position == "DEF" %}
+                <li>{{ player.first_name }} {{ player.last_name }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <h4>Midfielders</h4>
+    <ul>
+        {% for player in players %}
+            {% if player.position == "MID" %}
+                <li>{{ player.first_name }} {{ player.last_name }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <h4>Forwards</h4>
+    <ul>
+        {% for player in players %}
+            {% if player.position == "FW" %}
+                <li>{{ player.first_name }} {{ player.last_name }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

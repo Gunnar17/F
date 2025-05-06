@@ -1,0 +1,9 @@
+<h2>KSI Tournaments</h2>
+<div class="tournament-list">
+    {% for tournament in tournaments %}
+    <div class="tournament-card">
+        <h3>{{ tournament.name }}</h3>
+        <a href="{% url 'tournament_detail' tournament.tournament_number %}" class="btn">View Tournament</a>
+    </div>
+    {% endfor %}
+</div>

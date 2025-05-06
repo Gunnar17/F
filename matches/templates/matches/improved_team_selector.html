@@ -1,0 +1,91 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <h1>Select a Team</h1>
+
+  <div class="search-container">
+    <input type="text" id="team-search" class="form-control" placeholder="Search for a team...">
+  </div>
+
+  <div class="teams-grid">
+    {% for team in teams %}
+        {% if team.visibility.visible_to_users %}
+            <div class="team-card"
+               data-team-number="{{ team.team_number }}"
+               data-team-name="{{ team.name|lower }}"
+               data-category="{{ team.category }}">
+                <div class="team-logo-container">
+                  {% if team.logo %}
+                    <img src="{{ team.logo.url }}" alt="{{ team.name }}" class="team-logo">
+                  {% else %}
+                    <div class="team-logo-placeholder">{{ team.name|slice:":1" }}</div>
+                  {% endif %}
+                </div>
+                <h3 class="team-name">{{ team.name }}</h3>
+                <a href="{% url 'team_calendar' %}?team_id={{ team.team_number }}&month={{ month }}&year={{ year }}"
+                   class="btn btn-primary team-select-btn">View Calendar</a>
+            </div>
+        {% endif %}
+    {% endfor %}
+  </div>
+
+  <div id="no-results" class="no-results" style="display: none;">
+    <p>No teams match your search. Try a different term.</p>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('team-search');
+    const teamCards = document.querySelectorAll('.team-card');
+    const noResults = document.getElementById('no-results');
+    const categoryTabs = document.querySelectorAll('.tab-btn');
+
+    let activeCategory = 'all';
+
+    // Search functionality
+    searchInput.addEventListener('input', filterTeams);
+
+    // Category tab functionality
+    categoryTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        categoryTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        activeCategory = this.dataset.category;
+        filterTeams();
+      });
+    });
+
+    function filterTeams() {
+      const searchTerm = searchInput.value.toLowerCase();
+      let visibleCount = 0;
+
+      teamCards.forEach(card => {
+        const teamName = card.dataset.teamName;
+        const teamCategory = card.dataset.category;
+
+        // Check if team matches both search term and category filter
+        const matchesSearch = teamName.includes(searchTerm);
+        const matchesCategory = activeCategory === 'all' || teamCategory === activeCategory;
+
+        if (matchesSearch && matchesCategory) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Show "no results" message if needed
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+  });
+</script>
+{% endblock %}

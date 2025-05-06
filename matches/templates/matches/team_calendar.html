@@ -1,0 +1,127 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="team-calendar-container">
+  <h1>Team Match Calendar</h1>
+
+  <!-- Include our compact team switcher component -->
+  {% include "matches/components/compact_team_switcher.html" %}
+
+  <div class="calendar-header">
+    <h2>{{ team.name }} - {{ month_name }} {{ year }}</h2>
+
+    <!-- Tournament filter toggle -->
+    {% if has_filters %}
+    <div class="filter-toggle-container">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="filter-toggle" {% if not show_all %}checked{% endif %}>
+        <label class="form-check-label" for="filter-toggle">Show only main tournament matches</label>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="month-navigation">
+    <a href="{% url 'team_calendar' %}?team_id={{ team.team_number }}&month={{ month|add:"-1" }}&year={% if month == 1 %}{{ year|add:"-1" }}{% else %}{{ year }}{% endif %}{% if show_all %}&show_all=true{% endif %}" class="btn btn-month">Previous Month</a>
+    <span class="current-month">{{ month_name }} {{ year }}</span>
+    <a href="{% url 'team_calendar' %}?team_id={{ team.team_number }}&month={{ month|add:"1" }}&year={% if month == 12 %}{{ year|add:"1" }}{% else %}{{ year }}{% endif %}{% if show_all %}&show_all=true{% endif %}" class="btn btn-month">Next Month</a>
+  </div>
+
+  <table id="calendarTable" class="team-calendar">
+    <tr>
+      <th>Monday</th>
+      <th>Tuesday</th>
+      <th>Wednesday</th>
+      <th>Thursday</th>
+      <th>Friday</th>
+      <th>Saturday</th>
+      <th>Sunday</th>
+    </tr>
+    {% for week in days %}
+    <tr>
+      {% for day in week %}
+      <td {% if day and day.matches or day.ksi_matches %}class="has-matches"{% endif %}>
+      {% if day %}
+        <strong>{{ day.date|date:"d" }}</strong>
+        {% if day.matches or day.ksi_matches %}
+          <ul class="match-list">
+            {% for match in day.matches %}
+              <div class="match-card">
+                <div class="team {% if match.home_team.team_number == team.team_number %}home-team{% else %}away-team{% endif %}">
+                  {% if match.home_team.logo %}
+                    <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team.name }}" class="team-logo">
+                  {% else %}
+                    <span>{{ match.home_team.name }}</span>
+                  {% endif %}
+                </div>
+                <div class="match-details">
+                  <span class="match-time">{{ match.match_date|time:"H:i" }}</span>
+                  <span class="vs">vs</span>
+{#                  <p class="confederation">{{ match.confederation|capfirst }}</p>#}
+                </div>
+                <div class="team {% if match.away_team.team_number == team.team_number %}home-team{% else %}away-team{% endif %}">
+                  {% if match.away_team.logo %}
+                    <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team.name }}" class="team-logo">
+                  {% else %}
+                    <span>{{ match.away_team.name }}</span>
+                  {% endif %}
+                </div>
+                <a href="{% url 'game_details' match.id %}" class="match-link">View Details</a>
+              </div>
+            {% endfor %}
+
+            {% for match in day.ksi_matches %}
+              <div class="match-card ksi-match">
+                <div class="team {% if match.home_team.team_number == team.team_number %}home-team{% else %}away-team{% endif %}">
+                  <span>{{ match.home_team.name }}</span>
+                </div>
+                <div class="match-details">
+                  <span class="match-time">{{ match.match_date|time:"H:i" }}</span>
+                  <span class="vs">vs</span>
+{#                  <p class="tournament">{{ match.tournament.name|default:"Tournament" }}</p>#}
+                </div>
+                <div class="team {% if match.away_team.team_number == team.team_number %}home-team{% else %}away-team{% endif %}">
+                  <span>{{ match.away_team.name }}</span>
+                </div>
+                <a href="{% url 'match_detail' match.match_number %}" class="match-link">View Details</a>
+              </div>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-matches">No matches</p>
+        {% endif %}
+      {% endif %}
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div class="calendar-footer">
+    <a href="{% url 'home' %}" class="btn btn-back">Back to Home</a>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tournament filter toggle
+    const filterToggle = document.getElementById('filter-toggle');
+    if (filterToggle) {
+      filterToggle.addEventListener('change', function() {
+        // Get current URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Set or remove the show_all parameter
+        if (this.checked) {
+          urlParams.delete('show_all');
+        } else {
+          urlParams.set('show_all', 'true');
+        }
+
+        // Redirect to updated URL
+        window.location.href = window.location.pathname + '?' + urlParams.toString();
+      });
+    }
+  });
+</script>
+{% endblock %}

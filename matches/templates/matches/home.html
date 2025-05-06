@@ -1,0 +1,120 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>GameDay - {{ month_name }} {{ year }}</h2>
+
+{#<div class="month-navigation">#}
+{#    <button class="btn-month" onclick="changeMonth(-1)">Previous Month</button>#}
+{#    <span class="current-month">{{ month_name }} {{ year }}</span>#}
+{#    <button class="btn-month" onclick="changeMonth(1)">Next Month</button>#}
+{#</div>#}
+
+{#<div class="league-selection">#}
+{#    <h3>Select a League</h3>#}
+{#    <div class="league-buttons">#}
+{#        <a href="{% url 'league_table' 49315 %}" class="btn btn-league">Men's League Table</a>#}
+{#        <a href="{% url 'league_table' 49321 %}" class="btn btn-league">Women's League Table</a>#}
+{#    </div>#}
+{##}
+{#    <div class="gender-buttons">#}
+{#        <a href="{% url 'teams' 'men' %}" class="btn btn-gender">Men's Teams</a>#}
+{#        <a href="{% url 'teams' 'women' %}" class="btn btn-gender">Women's Teams</a>#}
+{#    </div>#}
+{#</div>#}
+
+<div class="team-filter">
+    <h3>View Calendar For A Specific Team</h3>
+    <a href="{% url 'team_calendar' %}?month={{ month }}&year={{ year }}" class="btn btn-primary">
+        Select a Team
+    </a>
+{#        <div class="filter-controls">#}
+{#            <select name="team_id" class="team-select">#}
+{#                <option value="">Select a Team</option>#}
+{#                {% for team in teams %}#}
+{#                    <option value="{{ team.team_number }}">{{ team.name }}</option>#}
+{#                {% endfor %}#}
+{#            </select>#}
+{#            <input type="hidden" name="month" value="{{ month }}">#}
+{#            <input type="hidden" name="year" value="{{ year }}">#}
+{#            <button type="submit" class="btn btn-filter">View Team Calendar</button>#}
+{#        </div>#}
+{#</div>#}
+
+{#<div class="upcoming-matches">#}
+{#    <h3>Today's Matches</h3>#}
+{#    <div class="match-list">#}
+{#        <!-- We'll only load today's matches, which is much more efficient -->#}
+{#        <div id="today-matches">#}
+{#            <p>Loading today's matches...</p>#}
+{#        </div>#}
+{#    </div>#}
+{#    <a href="{% url 'game_calendar' %}?month={{ month }}&year={{ year }}" class="btn btn-calendar">View Full Calendar</a>#}
+{#</div>#}
+
+<script>
+function changeMonth(monthDelta) {
+    var currentMonth = parseInt("{{ month }}");
+    var currentYear = parseInt("{{ year }}");
+
+    var newMonth = currentMonth + monthDelta;
+
+    if (newMonth < 1) {
+        newMonth = 12;
+        currentYear -= 1;
+    } else if (newMonth > 12) {
+        newMonth = 1;
+        currentYear += 1;
+    }
+
+    window.location.href = `/home/?month=${newMonth}&year=${currentYear}`;
+}
+
+// Fetch today's matches when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/todays-matches/')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('today-matches');
+
+            if (data.matches.length === 0) {
+                container.innerHTML = '<p>No matches scheduled for today.</p>';
+                return;
+            }
+
+            let html = '<div class="match-grid">';
+
+            data.matches.forEach(match => {
+                html += `
+                    <div class="match-card">
+                        <div class="team">
+                            ${match.home_team_logo ?
+                                `<img src="${match.home_team_logo}" alt="${match.home_team}" class="team-logo">` :
+                                match.home_team}
+                        </div>
+                        <div class="match-details">
+                            <span class="match-time">${match.time}</span>
+                            <span class="vs">vs</span>
+                            <p class="tournament">${match.tournament || "Match"}</p>
+                        </div>
+                        <div class="team">
+                            ${match.away_team_logo ?
+                                `<img src="${match.away_team_logo}" alt="${match.away_team}" class="team-logo">` :
+                                match.away_team}
+                        </div>
+                        <a href="${match.details_url}" class="match-link">View Details</a>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('today-matches').innerHTML =
+                '<p>Error loading matches. Please try again later.</p>';
+            console.error('Error:', error);
+        });
+});
+</script>
+{% endblock %}

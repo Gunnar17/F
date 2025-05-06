@@ -1,0 +1,464 @@
+{% extends 'matches/base.html' %}
+
+{% block title %}Game Details{% endblock %}
+{% block content %}
+
+<div class="gameday-staff-section">
+    <h3>Gameday Staff Management</h3>
+
+    {% if staff_jobs_count > 0 %}
+        <div class="staff-summary">
+            <p>
+                <strong>{{ staff_jobs_count }}</strong> job positions defined
+                {% if staff_vacancies > 0 %}
+                    <span class="text-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>{{ staff_vacancies }}</strong> positions still need to be filled!
+                    </span>
+                {% else %}
+                    <span class="text-success">
+                        <i class="fas fa-check-circle"></i>
+                        All positions filled!
+                    </span>
+                {% endif %}
+            </p>
+
+            {% if staff_vacancies > 0 %}
+                <div class="progress" style="height: 10px; margin-bottom: 15px;">
+                    <div class="progress-bar bg-danger" role="progressbar"
+                         style="width: {{ staffing_percentage }}%;"
+                         aria-valuenow="{{ staffing_percentage }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                        {{ staffing_percentage }}%
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>No gameday staff jobs have been defined yet. Start planning your event staff!</p>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a href="{% url 'gameday_staff' game.id %}" class="btn btn-primary">
+            <i class="fas fa-users-cog"></i> Manage Gameday Staff
+        </a>
+    </div>
+</div>
+    <div class="match-header">
+    <h2>{{ game.home_team }} vs {{ game.away_team }}</h2>
+    <p><strong>Date:</strong> {{ game.match_date }} | <strong>Formation:</strong> {{ home_formation }} vs {{ away_formation }}</p>
+</div>
+
+<div class="match-intro">
+    <h3>Gameday Introduction</h3>
+    <p>{{ gameday_text }}</p>
+
+<!-- Add this section for the goal song button -->
+<div class="goal-song-section">
+    {% if game.get_goal_song %}
+        <h3>{{ game.home_team.name }} Goal Song</h3>
+        <button id="goal-song-button" class="btn">
+            <span id="goal-icon">🔈</span> Play Goal Song
+        </button>
+        <audio id="goal-song-audio" src="{{ game.get_goal_song }}" preload="auto"></audio>
+    {% endif %}
+</div>
+</div>
+<!-- Add this to your game_details.html template -->
+<div class="game-predictions">
+    <h3>Match Predictions</h3>
+
+    {% if game.predictions.exists %}
+        <div class="predictions-list">
+            <p>{{ game.predictions.count }} prediction(s) available for this match.</p>
+            <a href="{% url 'new_prediction' %}?game={{ game.id }}" class="btn btn-primary">New Prediction</a>
+            <a href="#" class="btn btn-info view-predictions" data-toggle="modal" data-target="#predictionsModal">View Predictions</a>
+        </div>
+
+        <!-- Predictions Modal -->
+        <div class="modal fade" id="predictionsModal" tabindex="-1" role="dialog" aria-labelledby="predictionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="predictionsModalLabel">Predictions for {{ game.home_team }} vs {{ game.away_team }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="predictions-table-wrapper">
+                            <table class="predictions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Model</th>
+                                        <th>Result</th>
+                                        <th>Score</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+{% for prediction in game.predictions.all|dictsortreversed:"created_at" %}
+                                    <tr>
+                                        <td>{{ prediction.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ prediction.model.name }}</td>
+                                        <td>
+                                            <div class="mini-bar">
+                                                <div class="home-win" style="width: {{ prediction.home_win_probability|floatformat:0 }}%;" title="Home win: {{ prediction.home_win_probability|floatformat:1 }}%"></div>
+                                                <div class="draw" style="width: {{ prediction.draw_probability|floatformat:0 }}%;" title="Draw: {{ prediction.draw_probability|floatformat:1 }}%"></div>
+                                                <div class="away-win" style="width: {{ prediction.away_win_probability|floatformat:0 }}%;" title="Away win: {{ prediction.away_win_probability|floatformat:1 }}%"></div>
+                                            </div>
+                                            {{ prediction.prediction_result }}
+                                        </td>
+                                        <td>{{ prediction.predicted_home_goals|floatformat:1 }} - {{ prediction.predicted_away_goals|floatformat:1 }}</td>
+                                        <td>
+                                            <a href="{% url 'prediction_detail' prediction.id %}" class="btn btn-sm btn-info">Details</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <a href="{% url 'new_prediction' %}?game={{ game.id }}" class="btn btn-primary">New Prediction</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>No predictions available for this match yet.</p>
+        <a href="{% url 'new_prediction' %}?game={{ game.id }}" class="btn btn-primary">Create Prediction</a>
+    {% endif %}
+</div>
+
+<div class="match-history">
+    <h3>Recent Matches Between These Teams</h3>
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Home</th>
+                <th>Away</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prev_game in previous_games %}
+            <tr>
+                <td>{{ prev_game.match_date }}</td>
+                <td>{{ prev_game.home_team }}</td>
+                <td>{{ prev_game.away_team }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No previous matches found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="lineup-container">
+    <h3>Match Lineup</h3>
+
+    <div class="team-headers">
+        <div class="home-header">
+            <h4>{{ game.home_team.name }} <span class="formation-badge">{{ home_formation }}</span></h4>
+        </div>
+        <div class="away-header">
+            <h4>{{ game.away_team.name }} <span class="formation-badge">{{ away_formation }}</span></h4>
+        </div>
+    </div>
+
+    <div class="pitch">
+        <div class="pitch-markings">
+            <div class="halfway-line"></div>
+            <div class="center-circle"></div>
+            <div class="penalty-area home"></div>
+            <div class="goal-area home"></div>
+            <div class="penalty-area away"></div>
+            <div class="goal-area away"></div>
+        </div>
+
+        <!-- Home Team Players -->
+        {% for player in home_lineup %}
+            {% if forloop.counter <= 11 %}
+                <div class="player-card home" id="home-player-{{ player.position_number }}">
+                    {% if player.player %}
+                        <div class="player-number">{{ player.player.shirt_number|default:player.position_number }}</div>
+                        <div class="player-name">{{ player.player.name }}</div>
+                    {% else %}
+                        <div class="player-number">{{ player.position_number }}</div>
+                        <div class="player-name empty">-</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Away Team Players -->
+        {% for player in away_lineup %}
+            {% if forloop.counter <= 11 %}
+                <div class="player-card away" id="away-player-{{ player.position_number }}">
+                    {% if player.player %}
+                        <div class="player-number">{{ player.player.shirt_number|default:player.position_number }}</div>
+                        <div class="player-name">{{ player.player.name }}</div>
+                    {% else %}
+                        <div class="player-number">{{ player.position_number }}</div>
+                        <div class="player-name empty">-</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Team Substitutes -->
+    <div class="substitutes-container">
+        <div class="home-substitutes">
+            <h5>{{ game.home_team.name }} Substitutes</h5>
+            <div class="substitutes-list">
+                {% for player in home_lineup %}
+                    {% if forloop.counter > 11 and player.player %}
+                        <div class="substitute-player">
+                            <span class="sub-number">{{ player.player.shirt_number|default:"-" }}</span>
+                            <span class="sub-name">{{ player.player.name }}</span>
+                            <span class="sub-position">({{ player.position }})</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="away-substitutes">
+            <h5>{{ game.away_team.name }} Substitutes</h5>
+            <div class="substitutes-list">
+                {% for player in away_lineup %}
+                    {% if forloop.counter > 11 and player.player %}
+                        <div class="substitute-player">
+                            <span class="sub-number">{{ player.player.shirt_number|default:"-" }}</span>
+                            <span class="sub-name">{{ player.player.name }}</span>
+                            <span class="sub-position">({{ player.position }})</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this debugging info temporarily to help troubleshoot -->
+<div id="debug-info" style="background-color:#f8f8f8; padding:10px; margin:10px 0; border:1px solid #ddd; display:none;">
+    <h4>Debug Information</h4>
+    <button onclick="document.getElementById('debug-content').style.display = 'block'; this.style.display='none';">Show Debug Info</button>
+    <div id="debug-content" style="display:none;">
+        <p><strong>Home Formation:</strong> {{ home_formation }}</p>
+        <p><strong>Away Formation:</strong> {{ away_formation }}</p>
+
+        <h5>Home Lineup:</h5>
+        <ul>
+            {% for player in home_lineup %}
+                <li>
+                    Position {{ player.position_number }} ({{ player.position }}):
+                    {% if player.player %}
+                        {{ player.player.name }} (#{{ player.player.shirt_number|default:"N/A" }})
+                    {% else %}
+                        No player assigned
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>No players in home lineup</li>
+            {% endfor %}
+        </ul>
+
+        <h5>Away Lineup:</h5>
+        <ul>
+            {% for player in away_lineup %}
+                <li>
+                    Position {{ player.position_number }} ({{ player.position }}):
+                    {% if player.player %}
+                        {{ player.player.name }} (#{{ player.player.shirt_number|default:"N/A" }})
+                    {% else %}
+                        No player assigned
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>No players in away lineup</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% if game.get_goal_song %}
+
+
+<style>
+    .substitutes-container {
+        display: flex;
+        margin-top: 20px;
+        gap: 20px;
+    }
+
+    .home-substitutes, .away-substitutes {
+        flex: 1;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .substitutes-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .substitute-player {
+        background-color: #fff;
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-size: 0.9em;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .sub-number {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .sub-position {
+        color: #666;
+        font-size: 0.9em;
+    }
+    .gameday-staff-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.gameday-staff-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #343a40;
+}
+
+.staff-summary {
+    margin-bottom: 15px;
+}
+
+.action-buttons {
+    margin-top: 15px;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.text-success {
+    color: #28a745;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Lineup initialization starting");
+
+    // Get formation values
+    const homeFormation = "{{ home_formation }}";
+    const awayFormation = "{{ away_formation }}";
+
+    console.log("Home formation:", homeFormation);
+    console.log("Away formation:", awayFormation);
+
+    // Position players based on formation
+    positionPlayers(homeFormation, "home");
+    positionPlayers(awayFormation, "away");
+
+    // Log player elements to verify they exist
+    const homePlayers = document.querySelectorAll('.player-card.home');
+    const awayPlayers = document.querySelectorAll('.player-card.away');
+
+    console.log("Found home players:", homePlayers.length);
+    console.log("Found away players:", awayPlayers.length);
+});
+
+function positionPlayers(formation, team) {
+    if (!formation) {
+        console.error(`No formation provided for ${team} team`);
+        return;
+    }
+
+    console.log(`Positioning ${team} players with formation ${formation}`);
+    const positions = calculatePositions(formation, team);
+
+    for (let i = 1; i <= 11; i++) {
+        const playerElem = document.getElementById(`${team}-player-${i}`);
+        if (playerElem && positions[i]) {
+            console.log(`Setting position for ${team}-player-${i}:`, positions[i]);
+            playerElem.style.left = positions[i].x + '%';
+            playerElem.style.top = positions[i].y + '%';
+        } else {
+            console.warn(`Could not position ${team}-player-${i}. Element exists: ${!!playerElem}, Position exists: ${!!positions[i]}`);
+        }
+    }
+}
+
+function calculatePositions(formation, team) {
+    const positions = {};
+    const parts = formation.split('-');
+
+    console.log(`Calculating positions for ${formation} (${parts.length} parts)`);
+
+    // Process formations like 4-4-2, 4-3-3, etc.
+    let totalPlayers = 0;
+    const lines = [];
+
+    // Goalkeeper is always position 1
+    positions[1] = team === 'home' ? { x: 10, y: 50 } : { x: 90, y: 50 };
+    totalPlayers = 1;
+
+    // Add each line from the formation
+    for (let i = 0; i < parts.length; i++) {
+        const count = parseInt(parts[i]);
+        lines.push({ count, startPos: totalPlayers + 1 });
+        totalPlayers += count;
+    }
+
+    // Calculate positions for each line
+    lines.forEach((line, idx) => {
+        if (team === 'home') {
+            // Home team positions (left side of pitch)
+            // Space out defenders, midfielders, forwards evenly
+            const xPos = 20 + (idx * 15); // 20%, 35%, 50%, 65% across pitch
+
+            for (let i = 0; i < line.count; i++) {
+                // Distribute players vertically based on how many in this line
+                const spacing = 70 / (line.count + 1);
+                const yPos = 15 + ((i + 1) * spacing);
+                positions[line.startPos + i] = { x: xPos, y: yPos };
+            }
+        } else {
+            // Away team positions (right side of pitch)
+            const xPos = 80 - (idx * 15); // 80%, 65%, 50%, 35% across pitch
+
+            for (let i = 0; i < line.count; i++) {
+                const spacing = 70 / (line.count + 1);
+                const yPos = 15 + ((i + 1) * spacing);
+                positions[line.startPos + i] = { x: xPos, y: yPos };
+            }
+        }
+    });
+
+    return positions;
+}
+
+    function playGoalSong() {
+        var audio = document.getElementById("goalSong");
+        audio.play();
+    }
+
+
+
+</script>
+
+{% endif %}
+
+{% endblock %}

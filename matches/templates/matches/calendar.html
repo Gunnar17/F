@@ -1,0 +1,58 @@
+{% extends 'matches/base.html' %}
+
+{% block content %}
+
+<table id="calendarTable">
+    <thead>
+        <tr>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+            <th>Sunday</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for week in days %}
+        <tr>
+            {% for day in week %}
+            <td>
+                {% if day %}
+                    <strong>{{ day.date|date:"d" }}</strong>  <!-- Show the day of the month -->
+                    {% if day.matches %}
+                        <ul>
+                            {% for match in day.matches %}
+                                <div class="match-card">
+                                    <div class="team">
+                                        <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team.name }}" class="team-logo">
+                                    </div>
+                                    <div class="match-details">
+                                        <span class="match-time">{{ match.match_date|time:"H:i" }}</span>
+                                        <span class="vs">vs</span>
+{#                                        <p class="confederation">{{ match.confederation|capfirst }}</p>  <!-- Display Confederation -->#}
+                                    </div>
+                                    <div class="team">
+                                        <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team.name }}" class="team-logo">
+                                    </div>
+                                        {% if request.user.is_authenticated and request.user.groups.all.0.name == "Commentator" %}
+                                            <a href="{% url 'game_details' match.id %}" class="match-link">View Match</a>
+                                        {% else %}
+                                            <p class="no-access">🔒 Match details unavailable</p>
+                                        {% endif %}
+                                </div>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No games</p>
+                    {% endif %}
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,278 @@
+{% extends "matches/base.html" %}
+
+{% block title %}{{ player.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">{{ player.name }}</h1>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Player Information</h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-4x text-muted"></i>
+                        </div>
+                    </div>
+
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 40%;">Player ID:</th>
+                            <td>{{ player.player_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Team:</th>
+                            <td>
+                                <a href="{% url 'football:team_detail' player.team.team_number %}" class="text-decoration-none">
+                                    {{ player.team.name }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Birth Year:</th>
+                            <td>{{ player.birth_year }}</td>
+                        </tr>
+                    </table>
+
+                    <!-- Season Timeline -->
+                    <div class="mt-4">
+                        <h5>Season Timeline</h5>
+                        <div class="position-relative" style="height: 100px;">
+                            {% for event in season_events %}
+                                <div class="position-absolute" style="left: {{ event.position_percent }}%; top: 0;">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <div
+                                            class="rounded-circle d-flex justify-content-center align-items-center"
+                                            style="width: 24px; height: 24px;
+                                            background-color:
+                                                {% if event.type == 'goal' %}#28a745
+                                                {% elif event.type == 'yellow_card' %}#ffc107
+                                                {% elif event.type == 'red_card' %}#dc3545
+                                                {% else %}#6c757d{% endif %};">
+                                            {% if event.type == 'goal' %}⚽{% elif event.type == 'yellow_card' %}🟨{% elif event.type == 'red_card' %}🟥{% else %}⚪{% endif %}
+                                        </div>
+                                        <div class="small text-muted mt-1">{{ event.date|date:"d M" }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <!-- Timeline Line -->
+                            <div class="position-absolute" style="left: 0; right: 0; top: 12px; height: 2px; background-color: #dee2e6;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h2 class="h5 mb-0">Career Statistics</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr class="table-secondary">
+                            <th colspan="2" class="text-center">First Team</th>
+                        </tr>
+                        <tr>
+                            <th>Matches:</th>
+                            <td>{{ player.first_team_matches }}</td>
+                        </tr>
+                        <tr>
+                            <th>Goals:</th>
+                            <td>{{ player.first_team_goals }}</td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <th colspan="2" class="text-center">National Team</th>
+                        </tr>
+                        <tr>
+                            <th>Matches:</th>
+                            <td>{{ player.national_team_matches }}</td>
+                        </tr>
+                        <tr>
+                            <th>Goals:</th>
+                            <td>{{ player.national_team_goals }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0">Recent Match Events</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Match</th>
+                                    <th>Event</th>
+                                    <th>Minute</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                <tr>
+                                    <td>{{ event.match.match_date|date:"d M Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'football:match_detail' event.match.match_number %}" class="text-decoration-none">
+                                            {{ event.match.home_team.name }} vs {{ event.match.away_team.name }}
+                                        </a>
+                                        <div class="small text-muted">{{ event.match.tournament.name }}</div>
+                                    </td>
+                                    <td>
+                                        {% if "goal" in event.event_type|lower %}
+                                            <span class="badge bg-success">⚽ Goal</span>
+                                        {% elif "yellow" in event.event_type|lower %}
+                                            <span class="badge bg-warning text-dark">🟨 Yellow Card</span>
+                                        {% elif "red" in event.event_type|lower %}
+                                            <span class="badge bg-danger">🟥 Red Card</span>
+                                        {% elif "own goal" in event.event_type|lower %}
+                                            <span class="badge bg-secondary">⚽ Own Goal</span>
+                                        {% elif "substit" in event.event_type|lower %}
+                                            <span class="badge bg-info text-dark">🔄 Substitution</span>
+                                        {% elif "penalty" in event.event_type|lower %}
+                                            <span class="badge bg-primary">⚽ Penalty</span>
+                                        {% else %}
+                                            <span class="badge bg-dark">{{ event.event_type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ event.minute }}'</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">No event data available for this player</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h2 class="h5 mb-0">Performance Summary</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Goals per Match</h6>
+                                    <div class="display-4 mb-2">
+                                        {% if player.first_team_matches > 0 %}
+                                            {{ player.first_team_goals|floatformat:2 }}
+                                        {% else %}
+                                            0.00
+                                        {% endif %}
+                                    </div>
+                                    <div class="small text-muted">Based on {{ player.first_team_matches }} matches</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Yellow Cards</h6>
+                                    <div class="display-4 mb-2">
+                                        {{ player_stats.yellow_cards|default:"0" }}
+                                    </div>
+                                    <div class="small text-muted">
+                                        {% if player_stats.yellow_cards > 0 %}
+                                            {{ player_stats.yellow_cards_per_match|floatformat:2 }} per match
+                                        {% else %}
+                                            0.00 per match
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Red Cards</h6>
+                                    <div class="display-4 mb-2">
+                                        {{ player_stats.red_cards|default:"0" }}
+                                    </div>
+                                    <div class="small text-muted">
+                                        {% if player_stats.red_cards > 0 %}
+                                            {{ player_stats.red_cards_per_match|floatformat:2 }} per match
+                                        {% else %}
+                                            0.00 per match
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Match Participation</h6>
+                                    <div class="display-4 mb-2">
+                                        {% if player_stats.total_matches and player.team.total_matches %}
+                                            {{ player_stats.participation_percentage|floatformat:0 }}%
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </div>
+                                    <div class="small text-muted">Of team's matches this season</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Tournaments Participation</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Tournament</th>
+                                    <th class="text-center">Matches</th>
+                                    <th class="text-center">Goals</th>
+                                    <th class="text-center">Yellow Cards</th>
+                                    <th class="text-center">Red Cards</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tournament in tournament_stats %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'football:tournament_detail' tournament.tournament.tournament_number %}" class="text-decoration-none">
+                                            {{ tournament.tournament.name }}
+                                        </a>
+                                    </td>
+                                    <td class="text-center">{{ tournament.matches }}</td>
+                                    <td class="text-center">{{ tournament.goals }}</td>
+                                    <td class="text-center">{{ tournament.yellow_cards }}</td>
+                                    <td class="text-center">{{ tournament.red_cards }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-3">No tournament statistics available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

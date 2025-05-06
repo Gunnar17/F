@@ -1,0 +1,86 @@
+{% extends 'matches/base.html' %}
+
+{% block content %}
+<h2>League Standings</h2>
+
+<h3>Local Standings</h3>
+<table>
+    <tr>
+        <th>Team</th>
+        <th>Played</th>
+        <th>Wins</th>
+        <th>Draws</th>
+        <th>Losses</th>
+        <th>Goals For</th>
+        <th>Goals Against</th>
+        <th>Goal Difference</th>
+        <th>Points</th>
+    </tr>
+    {% for team in standings %}
+    <tr>
+        <td class="team-cell">
+            {% if team.team_logo %}
+                <img src="{{ team.team_logo.url }}" alt="{{ team.team }}" class="standings-team-logo">
+            {% endif %}
+            <span>{{ team.team }}</span>
+        </td>
+        <td>{{ team.games_played }}</td>
+        <td>{{ team.wins }}</td>
+        <td>{{ team.draws }}</td>
+        <td>{{ team.losses }}</td>
+        <td>{{ team.scored }}</td>
+        <td>{{ team.conceded }}</td>
+        <td>{{ team.goal_difference }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Replace KSI Tournament Standings part (around line 30-49) -->
+<h3>KSI Tournament Standings</h3>
+<table>
+    <tr>
+        <th>Team</th>
+        <th>Played</th>
+        <th>Wins</th>
+        <th>Draws</th>
+        <th>Losses</th>
+        <th>Goals For</th>
+        <th>Goals Against</th>
+        <th>Goal Difference</th>
+        <th>Points</th>
+    </tr>
+    {% for standing in ksi_standings %}
+    <tr>
+        <td class="team-cell">
+            {% if standing.team.logo %}
+                <img src="{{ standing.team.logo.url }}" alt="{{ standing.team.name }}" class="standings-team-logo">
+            {% endif %}
+            <span>{{ standing.team.name }}</span>
+        </td>
+        <td>{{ standing.matches_played }}</td>
+        <td>{{ standing.matches_won }}</td>
+        <td>{{ standing.matches_drawn }}</td>
+        <td>{{ standing.matches_lost }}</td>
+        <td>{{ standing.goals_scored }}</td>
+        <td>{{ standing.goals_conceded }}</td>
+        <td>{{ standing.goal_difference }}</td>
+        <td><strong>{{ standing.points }}</strong></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Add CSS for team logos in standings tables -->
+<style>
+    .team-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .standings-team-logo {
+        max-width: 24px;
+        max-height: 24px;
+        margin-right: 8px;
+    }
+</style>
+<{% endblock %}

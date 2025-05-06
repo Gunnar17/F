@@ -1,0 +1,137 @@
+{% extends 'predictions/base.html' %}
+
+{% block content %}
+<div class="model-detail-container">
+    <div class="header">
+        <h1>Model Details: {{ model.name }}</h1>
+        <div class="actions">
+            <a href="{% url 'predictions_home' %}" class="btn btn-secondary">Back to Predictions</a>
+            {% if not model.is_active %}
+            <a href="{% url 'set_active_model' model.id %}" class="btn btn-primary">Set as Active Model</a>
+            {% endif %}
+            <a href="{% url 'delete_model' model.id %}" class="btn btn-danger">Delete Model</a>
+        </div>
+    </div>
+
+    <div class="model-info-card">
+        <div class="model-info">
+            <h2>Model Information</h2>
+            <table class="info-table">
+                <tr>
+                    <th>Name:</th>
+                    <td>{{ model.name }}</td>
+                </tr>
+                <tr>
+                    <th>Type:</th>
+                    <td>{{ model.get_model_type_display }}</td>
+                </tr>
+                <tr>
+                    <th>Created:</th>
+                    <td>{{ model.created_at|date:"F j, Y" }} at {{ model.created_at|time:"H:i" }}</td>
+                </tr>
+                <tr>
+                    <th>Training Accuracy:</th>
+                    <td>{{ model.accuracy|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <th>Status:</th>
+                    <td>{% if model.is_active %}<span class="active-badge">Active</span>{% else %}Inactive{% endif %}</td>
+                </tr>
+                {% if real_world_accuracy %}
+                <tr>
+                    <th>Real-world Accuracy:</th>
+                    <td>{{ real_world_accuracy|floatformat:2 }} ({{ correct_predictions }} correct out of {{ played_predictions }})</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+
+        <div class="model-features">
+            <h2>Model Features</h2>
+            <div class="feature-list">
+                <ul>
+                {% for feature in model.feature_columns %}
+                    <li>{{ feature }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="predictions-section">
+        <h2>Recent Predictions</h2>
+        <p class="count-summary">Showing {{ predictions|length }} of {{ total_predictions }} total predictions</p>
+
+        {% if predictions %}
+        <div class="prediction-table-wrapper">
+            <table class="prediction-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Match</th>
+                        <th>Prediction</th>
+                        <th>Predicted Score</th>
+                        <th>Actual Result</th>
+                        <th>Correct?</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in predictions %}
+                    <tr>
+                        <td>{{ pred.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            {{ pred.game.home_team.name }} vs {{ pred.game.away_team.name }}<br>
+                            <small>{{ pred.game.match_date|date:"M d, Y" }}</small>
+                        </td>
+                        <td>
+                            <div class="mini-bar">
+                                <div class="home-win" style="width: {{ pred.home_win_probability|floatformat:0 }}%;" title="Home win: {{ pred.home_win_probability|floatformat:1 }}%"></div>
+                                <div class="draw" style="width: {{ pred.draw_probability|floatformat:0 }}%;" title="Draw: {{ pred.draw_probability|floatformat:1 }}%"></div>
+                                <div class="away-win" style="width: {{ pred.away_win_probability|floatformat:0 }}%;" title="Away win: {{ pred.away_win_probability|floatformat:1 }}%"></div>
+                            </div>
+                            {{ pred.prediction_result }}
+                        </td>
+                        <td>{{ pred.predicted_home_goals|floatformat:1 }} - {{ pred.predicted_away_goals|floatformat:1 }}</td>
+                        <td>
+                            {% if pred.game.played %}
+                                {% if pred.game.home_goals > pred.game.away_goals %}
+                                    Home Win ({{ pred.game.home_goals }}-{{ pred.game.away_goals }})
+                                {% elif pred.game.home_goals < pred.game.away_goals %}
+                                    Away Win ({{ pred.game.home_goals }}-{{ pred.game.away_goals }})
+                                {% else %}
+                                    Draw ({{ pred.game.home_goals }}-{{ pred.game.away_goals }})
+                                {% endif %}
+                            {% else %}
+                                Not played
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if pred.game.played %}
+                                {% if pred.game.home_goals > pred.game.away_goals and pred.prediction_result == "Home Win" %}
+                                    <span class="correct">✓</span>
+                                {% elif pred.game.home_goals < pred.game.away_goals and pred.prediction_result == "Away Win" %}
+                                    <span class="correct">✓</span>
+                                {% elif pred.game.home_goals == pred.game.away_goals and pred.prediction_result == "Draw" %}
+                                    <span class="correct">✓</span>
+                                {% else %}
+                                    <span class="incorrect">✗</span>
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'prediction_detail' pred.id %}" class="btn btn-sm btn-info">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No predictions have been made with this model yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

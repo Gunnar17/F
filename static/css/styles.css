@@ -1,0 +1,2980 @@
+/* ===============================
+   General Page Styling
+   =============================== */
+
+/* Reset default styles for body and common elements */
+body, h1, h2, h3, p, ul {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Default styling (when no team is selected) */
+body:not(.team-color-active) {
+    color: white;
+    background-color: black;
+}
+
+body:not(.team-color-active) h1,
+body:not(.team-color-active) h2,
+body:not(.team-color-active) h3,
+body:not(.team-color-active) p,
+body:not(.team-color-active) ul {
+    color: white;
+}
+
+/* Container for content layout */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+body:not(.team-color-active) .container {
+    background-color: black;
+}
+
+/* ===============================
+   Navigation Bar Styling
+   =============================== */
+
+.navbar {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+body:not(.team-color-active) .navbar {
+    background-color: black;
+    color: #d32f2f;
+}
+
+.navbar a {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+body:not(.team-color-active) .navbar a {
+    color: white;
+}
+
+body:not(.team-color-active) .navbar a:hover {
+    color: white;
+}
+
+/* ===============================
+   User Dropdown Menu Styling
+   =============================== */
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-icon {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+body:not(.team-color-active) .user-icon {
+    background: #d32f2f;
+    color: black;
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    min-width: 150px;
+    border-radius: 5px;
+    z-index: 100;
+}
+
+body:not(.team-color-active) .user-dropdown {
+    background: black;
+    box-shadow: 0 4px 8px rgba(211, 47, 47, 0.5);
+}
+
+.user-dropdown a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+}
+
+body:not(.team-color-active) .user-dropdown a {
+    color: #d32f2f;
+}
+
+body:not(.team-color-active) .user-dropdown a:hover {
+    background: #d32f2f;
+    color: black;
+}
+
+.user-menu:hover .user-dropdown {
+    display: block;
+}
+
+/* ===============================
+   Table Styling (Used for Calendar & League Table)
+   =============================== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+body:not(.team-color-active) table {
+    background-color: black;
+    color: white;
+}
+
+body:not(.team-color-active) table,
+body:not(.team-color-active) th,
+body:not(.team-color-active) td {
+    border: 1px solid #d32f2f;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+body:not(.team-color-active) th {
+    background-color: #d32f2f;
+    color: black;
+}
+
+/* ===============================
+   Calendar Styling
+   =============================== */
+
+/* Make sure the calendar table itself uses the team primary color */
+body.team-color-active #calendarTable {
+    background-color: transparent;
+    border-color: var(--team-secondary);
+}
+
+/* Calendar table cells */
+body.team-color-active #calendarTable td {
+    background-color: transparent;
+    border-color: var(--team-secondary);
+    color: var(--team-text-on-primary);
+}
+
+/* Make sure calendar headings (days of week) stand out */
+body.team-color-active #calendarTable th {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    border-color: var(--team-secondary);
+}
+
+/* For empty calendar cells */
+body.team-color-active #calendarTable td:empty {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Make calendar day numbers stand out */
+body.team-color-active #calendarTable td strong {
+    color: var(--team-text-on-primary);
+    font-size: 1.2em;
+}
+
+/* Make "No games" text more visible */
+body.team-color-active #calendarTable td p {
+    color: var(--team-text-on-primary);
+    opacity: 0.8;
+}
+
+/* Keep match cards white for readability */
+body.team-color-active #calendarTable .match-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-active {
+    background-color: #007bff;
+    color: white;
+}
+
+.full-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.full-calendar th {
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.full-calendar td {
+    height: 120px;
+    vertical-align: top;
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/*.has-matches {*/
+/*    background-color: #f8f8ff;*/
+/*}*/
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.matches-preview {
+    margin: 5px 0;
+}
+
+.match-preview {
+    font-size: 0.85em;
+    padding: 3px 0;
+}
+
+.view-day-matches {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.no-matches {
+    color: #999;
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.match-count {
+    font-size: 0.75em;
+    color: #666;
+}
+
+/* Modal for day matches */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    margin: 5% auto;
+    width: 80%;
+    max-width: 800px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-match-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/*   Team Calendar Styling*/
+/*   =============================== *!*/
+
+.team-calendar-container {
+    margin-bottom: 30px;
+}
+
+.calendar-header {
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.calendar-header h2 {
+    margin: 0;
+}
+
+.filter-toggle-container {
+    margin-left: 20px;
+}
+
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    background: #d32f2f;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.team-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.team-calendar th {
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.team-calendar td {
+    vertical-align: top;
+    border: 1px solid #ddd;
+}
+
+.has-matches {
+    background-color: #d32f2f;
+}
+
+.match-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.match-card {
+    font-size: 0.8em;
+    margin-bottom: 2px;
+    padding: 5px;
+    background-color: black;
+    border-radius: 15px;
+}
+
+.ksi-match {
+    background-color: black;
+}
+
+
+.match-link {
+    text-align: center;
+    font-size: 1em;
+    margin-top: 2px;
+}
+
+.team-logo {
+    max-width: 30px;
+    max-height: 30px;
+}
+
+.calendar-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Form switch styles for the filter toggle */
+.form-check {
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 1.5em;
+    margin-bottom: 0.125rem;
+}
+
+.form-check-input {
+    width: 2em;
+    height: 1em;
+    margin-top: 0.25em;
+    vertical-align: top;
+    background-color: #fff;
+    background-repeat: repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1px solid #ddd;
+    color-adjust: exact;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.form-switch {
+    padding-left: 2.5em;
+}
+
+.form-switch .form-check-input {
+    width: 2em;
+    margin-left: -2.5em;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+    border-radius: 2em;
+    transition: background-position 0.15s ease-in-out;
+}
+
+.form-switch .form-check-input:checked {
+    background-position: right center;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+/* ===============================
+   Team Switcher Component
+   =============================== */
+
+.team-switcher {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.current-team {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #d32f2f;
+    border-radius: 8px;
+    background: #d32f2f;
+}
+
+.team-icon {
+    margin-right: 15px;
+}
+
+.team-icon-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.team-icon-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: deepskyblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.team-info {
+    flex: 1;
+}
+
+.team-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.btn-change-team {
+    background-color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 12px;
+
+}
+
+.recent-teams {
+    margin-top: 15px;
+}
+
+.recent-teams h4 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.recent-teams-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 5px;
+}
+
+.recent-team-item {
+    min-width: 90px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.recent-team-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 5px;
+}
+
+.recent-team-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: deepskyblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 auto 5px;
+}
+
+.recent-team-item span {
+    font-size: 12px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-search-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #d32f2f;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-top: 10px;
+    z-index: 100;
+    display: none;
+}
+
+.search-header {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.search-header input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.btn-close-search {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.team-result-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: inherit;
+}
+
+.team-result-item:hover {
+    background: #d32f2f;
+}
+
+.team-result-logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.team-result-placeholder {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.view-all-teams {
+    text-align: center;
+    border-radius: 15px;
+    background-color: black;
+    margin-left: 250px;
+    margin-right: 250px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* ===============================
+   Improved Team Selector
+   =============================== */
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+.category-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.tab-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.team-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.team-logo-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.team-logo {
+    max-height: 70px;
+    max-width: 70px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.team-select-btn {
+    width: 100%;
+}
+
+/* ===============================
+   Buttons Styling
+   =============================== */
+
+.btn {
+    color: white;
+    padding: 14px 24px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    transition: all 0.3s ease-in-out;
+}
+
+body:not(.team-color-active) .btn {
+    color: white;
+}
+
+/* ===============================
+   Match Card Styling
+   =============================== */
+
+.match-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 5px 0;
+    transition: transform 0.2s ease-in-out;
+}
+
+body:not(.team-color-active) .match-card {
+    background: #1a1a1a;
+    border: 1px solid #d32f2f;
+    box-shadow: 2px 2px 10px rgba(255, 0, 0, 0.2);
+}
+
+body:not(.team-color-active) .match-card:hover {
+    transform: scale(1.05);
+    box-shadow: 4px 4px 15px rgba(255, 0, 0, 0.3);
+}
+
+.match-teams {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.match-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.vs {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.match-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.tournament {
+    color: #666;
+}
+
+/* ===============================
+   Team Grid Styling
+   =============================== */
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.team-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.2s, background 0.3s;
+}
+
+body:not(.team-color-active) .team-item {
+    background-color: #222;
+    border: 1px solid #d32f2f;
+}
+
+body:not(.team-color-active) .team-item:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+body:not(.team-color-active) .team-name {
+    color: white;
+}
+
+body:not(.team-color-active) .team-name:hover {
+    color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .team-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* ===============================
+   Navigation Buttons
+   =============================== */
+
+.navigation-buttons {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.navigation-buttons .btn {
+    display: inline-block;
+    padding: 15px 25px;
+    margin: 10px;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+body:not(.team-color-active) .navigation-buttons .btn:active {
+    transform: scale(1.05);
+    box-shadow: none;
+}
+
+.league-table {
+    width: 80%;
+    margin: 0 auto;
+    font-size: 14px;
+}
+
+.team-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .league-table {
+        width: 100%;
+        font-size: 12px;
+    }
+
+
+    .team-logo {
+        width: 30px;
+        height: 30px;
+    }
+
+    .navigation-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        width: 90%;
+        text-align: center;
+        font-size: 18px;
+    }
+}
+
+/* ===============================
+   Goal Song Button
+   =============================== */
+
+.goal-song-section {
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+body:not(.team-color-active) .goal-song-section {
+    background-color: #1a1a1a;
+    border: 1px solid #d32f2f;
+}
+
+#goal-song-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+body:not(.team-color-active) #goal-song-button {
+    background: linear-gradient(45deg, #d32f2f, #ff4500);
+    color: white;
+    box-shadow: 0 4px 10px rgba(211, 47, 47, 0.5);
+}
+
+body:not(.team-color-active) #goal-song-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #ff4500, #d32f2f);
+    box-shadow: 0 6px 15px rgba(211, 47, 47, 0.7);
+}
+
+body:not(.team-color-active) #goal-song-button:active {
+    transform: scale(1);
+    box-shadow: none;
+}
+
+#goal-icon {
+    font-size: 24px;
+    margin-right: 5px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#goal-song-button.playing {
+    animation: pulse 2s infinite;
+}
+
+body:not(.team-color-active) #goal-song-button.playing {
+    background: linear-gradient(45deg, #ff4500, #d32f2f);
+}
+
+/* ===============================
+   Team Switching Link
+   =============================== */
+
+.team-switch-link {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 5px 0;
+    transition: background-color 0.2s;
+}
+
+body:not(.team-color-active) .team-switch-link {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+body:not(.team-color-active) .team-switch-link:hover {
+    background-color: rgba(76, 175, 80, 0.2);
+}
+
+.selected-team {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+body:not(.team-color-active) .selected-team {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===============================
+   Button Month Navigation
+   =============================== */
+
+.btn-month {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* ===============================
+   Home Page Specific Styles
+   =============================== */
+
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.current-month {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.league-selection, .team-filter, .upcoming-matches {
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.league-buttons, .gender-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.btn-league, .btn-gender {
+    flex: 1;
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.team-select {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.match-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* ===============================
+   Game Details Page
+   =============================== */
+
+.match-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.match-header h2 {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.match-intro, .match-history {
+    margin-bottom: 30px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.history-table th, .history-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.history-table th {
+    background-color: #f5f5f5;
+}
+
+.history-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.lineup-container {
+    margin-top: 40px;
+}
+
+.team-headers {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 0 5%;
+}
+
+.home-header, .away-header {
+    width: 45%;
+}
+
+.away-header {
+    text-align: right;
+}
+
+.formation-badge {
+    background-color: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+.pitch {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    height: 650px;
+    margin: 0 auto;
+    background: #4CAF50;
+    border: 2px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.pitch-markings {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.halfway-line {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: white;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.center-circle {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid white;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+}
+
+/* ===============================
+   General Page Styling
+   =============================== */
+
+/* Reset default styles for body and common elements */
+body, h1, h2, h3, p, ul {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Default styling (when no team is selected) */
+body:not(.team-color-active) {
+    color: white;
+    background-color: black;
+}
+
+body:not(.team-color-active) h1,
+body:not(.team-color-active) h2,
+body:not(.team-color-active) h3,
+body:not(.team-color-active) p,
+body:not(.team-color-active) ul {
+    color: white;
+}
+
+/* Container for content layout */
+.container {
+    color: black;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+body:not(.team-color-active) .container {
+    background-color: black;
+}
+
+/* ===============================
+   Navigation Bar Styling
+   =============================== */
+
+.navbar {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+body:not(.team-color-active) .navbar {
+    background-color: black;
+    color: #d32f2f;
+}
+
+.navbar a {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+body:not(.team-color-active) .navbar a {
+    color: white;
+}
+
+body:not(.team-color-active) .navbar a:hover {
+    color: white;
+}
+
+/* ===============================
+   User Dropdown Menu Styling
+   =============================== */
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-icon {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+body:not(.team-color-active) .user-icon {
+    background: #d32f2f;
+    color: black;
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    min-width: 150px;
+    border-radius: 5px;
+    z-index: 100;
+}
+
+body:not(.team-color-active) .user-dropdown {
+    background: black;
+    box-shadow: 0 4px 8px rgba(211, 47, 47, 0.5);
+}
+
+.user-dropdown a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+}
+
+body:not(.team-color-active) .user-dropdown a {
+    color: #d32f2f;
+}
+
+body:not(.team-color-active) .user-dropdown a:hover {
+    background: #d32f2f;
+    color: black;
+}
+
+.user-menu:hover .user-dropdown {
+    display: block;
+}
+
+/* ===============================
+   Table Styling (Used for Calendar & League Table)
+   =============================== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+body:not(.team-color-active) table {
+    background-color: black;
+    color: white;
+}
+
+body:not(.team-color-active) table,
+body:not(.team-color-active) th,
+body:not(.team-color-active) td {
+    border: 1px solid #d32f2f;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+body:not(.team-color-active) th {
+    background-color: #d32f2f;
+    color: black;
+}
+
+/* ===============================
+   Calendar Styling
+   =============================== */
+
+/* Make sure the calendar table itself uses the team primary color */
+body.team-color-active #calendarTable {
+    background-color: transparent;
+    border-color: var(--team-secondary);
+}
+
+/* Calendar table cells */
+body.team-color-active #calendarTable td {
+    background-color: transparent;
+    border-color: var(--team-secondary);
+    color: var(--team-text-on-primary);
+}
+
+/* Make sure calendar headings (days of week) stand out */
+body.team-color-active #calendarTable th {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    border-color: var(--team-secondary);
+}
+
+/* For empty calendar cells */
+body.team-color-active #calendarTable td:empty {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Make calendar day numbers stand out */
+body.team-color-active #calendarTable td strong {
+    color: var(--team-text-on-primary);
+    font-size: 1.2em;
+}
+
+/* Make "No games" text more visible */
+body.team-color-active #calendarTable td p {
+    color: var(--team-text-on-primary);
+    opacity: 0.8;
+}
+
+/* Keep match cards white for readability */
+body.team-color-active #calendarTable .match-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-active {
+    background-color: #007bff;
+    color: white;
+}
+
+.full-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.full-calendar th {
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.full-calendar td {
+    height: 120px;
+    vertical-align: top;
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.has-matches {
+    background-color: #f8f8ff;
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.matches-preview {
+    margin: 5px 0;
+}
+
+.match-preview {
+    font-size: 0.85em;
+    padding: 3px 0;
+}
+
+.view-day-matches {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.no-matches {
+    color: #999;
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.match-count {
+    font-size: 0.75em;
+    color: #666;
+}
+
+/* Modal for day matches */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    margin: 5% auto;
+    width: 80%;
+    max-width: 800px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-match-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* ===============================
+   Team Calendar Styling
+   =============================== */
+
+.team-calendar-container {
+    margin-bottom: 30px;
+}
+
+.calendar-header {
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.calendar-header h2 {
+    margin: 0;
+}
+
+.filter-toggle-container {
+    margin-left: 20px;
+}
+
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    /*background: #f5f5f5;*/
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.team-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.team-calendar th {
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.team-calendar td {
+    height: 120px;
+    vertical-align: top;
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+.has-matches {
+    background-color: #f8f8ff;
+}
+
+.match-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.match-card {
+    font-size: 0.8em;
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.ksi-match {
+    background-color: #fff8e6;
+}
+
+.home-team {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.match-time {
+    color: #666;
+}
+
+.match-link {
+    display: block;
+    text-align: center;
+    font-size: 0.8em;
+    margin-top: 3px;
+}
+
+.team-logo {
+    max-width: 30px;
+    max-height: 30px;
+}
+
+.calendar-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Form switch styles for the filter toggle */
+.form-check {
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 1.5em;
+    margin-bottom: 0.125rem;
+}
+
+.form-check-input {
+    width: 2em;
+    height: 1em;
+    margin-top: 0.25em;
+    vertical-align: top;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1px solid #ddd;
+    appearance: none;
+    color-adjust: exact;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.form-switch {
+    padding-left: 2.5em;
+}
+
+.form-switch .form-check-input {
+    width: 2em;
+    margin-left: -2.5em;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+    border-radius: 2em;
+    transition: background-position 0.15s ease-in-out;
+}
+
+.form-switch .form-check-input:checked {
+    background-position: right center;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+/* ===============================
+   Team Switcher Component
+   =============================== */
+
+.team-switcher {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.current-team {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.team-icon {
+    margin-right: 15px;
+}
+
+.team-icon-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.team-icon-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.team-info {
+    flex: 1;
+}
+
+.team-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.btn-change-team {
+    border: none;
+    background: transparent;
+    color: #007bff;
+    padding: 0;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.recent-teams {
+    margin-top: 15px;
+}
+
+.recent-teams h4 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.recent-teams-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 5px;
+}
+
+.recent-team-item {
+    min-width: 90px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.recent-team-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 5px;
+}
+
+.recent-team-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 auto 5px;
+}
+
+.recent-team-item span {
+    font-size: 12px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-search-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-top: 10px;
+    z-index: 100;
+    display: none;
+}
+
+.search-header {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.search-header input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.btn-close-search {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.team-result-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: inherit;
+}
+
+.team-result-item:hover {
+    background: #f5f5f5;
+}
+
+.team-result-logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.view-all-teams {
+    text-align: center;
+}
+
+/* ===============================
+   Improved Team Selector
+   =============================== */
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+.category-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.tab-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.team-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.team-logo-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.team-logo {
+    max-height: 70px;
+    max-width: 70px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.team-select-btn {
+    width: 100%;
+}
+
+/* ===============================
+   Buttons Styling
+   =============================== */
+
+.btn {
+    padding: 14px 24px;
+    font-size: 18px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    transition: all 0.3s ease-in-out;
+}
+
+body:not(.team-color-active) .btn {
+    color: white;
+}
+
+/* ===============================
+   Match Card Styling
+   =============================== */
+
+.match-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 5px 0;
+    transition: transform 0.2s ease-in-out;
+}
+
+body:not(.team-color-active) .match-card {
+    background: #1a1a1a;
+    border: 1px solid #d32f2f;
+    box-shadow: 2px 2px 10px rgba(255, 0, 0, 0.2);
+}
+
+body:not(.team-color-active) .match-card:hover {
+    transform: scale(1.05);
+    box-shadow: 4px 4px 15px rgba(255, 0, 0, 0.3);
+}
+
+.match-teams {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.match-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.vs {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.match-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.tournament {
+    color: #666;
+}
+
+/* ===============================
+   Team Grid Styling
+   =============================== */
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.team-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.2s, background 0.3s;
+}
+
+body:not(.team-color-active) .team-item {
+    background-color: #222;
+    border: 1px solid #d32f2f;
+}
+
+body:not(.team-color-active) .team-item:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+body:not(.team-color-active) .team-name {
+    color: white;
+}
+
+body:not(.team-color-active) .team-name:hover {
+    color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .team-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* ===============================
+   Navigation Buttons
+   =============================== */
+
+.navigation-buttons {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.navigation-buttons .btn {
+    display: inline-block;
+    padding: 15px 25px;
+    margin: 10px;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+body:not(.team-color-active) .navigation-buttons .btn:active {
+    transform: scale(1.05);
+    box-shadow: none;
+}
+
+.league-table {
+    width: 80%;
+    margin: 0 auto;
+    font-size: 14px;
+}
+
+.team-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ===============================
+   Goal Song Button
+   =============================== */
+
+.goal-song-section {
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+body:not(.team-color-active) .goal-song-section {
+    background-color: #1a1a1a;
+    border: 1px solid #d32f2f;
+}
+
+#goal-song-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+body:not(.team-color-active) #goal-song-button {
+    background: linear-gradient(45deg, #d32f2f, #ff4500);
+    color: white;
+    box-shadow: 0 4px 10px rgba(211, 47, 47, 0.5);
+}
+
+body:not(.team-color-active) #goal-song-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #ff4500, #d32f2f);
+    box-shadow: 0 6px 15px rgba(211, 47, 47, 0.7);
+}
+
+body:not(.team-color-active) #goal-song-button:active {
+    transform: scale(1);
+    box-shadow: none;
+}
+
+#goal-icon {
+    font-size: 24px;
+    margin-right: 5px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#goal-song-button.playing {
+    animation: pulse 2s infinite;
+}
+
+body:not(.team-color-active) #goal-song-button.playing {
+    background: linear-gradient(45deg, #ff4500, #d32f2f);
+}
+
+/* ===============================
+   Team Switching Link
+   =============================== */
+
+.team-switch-link {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 5px 0;
+    transition: background-color 0.2s;
+}
+
+body:not(.team-color-active) .team-switch-link {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+body:not(.team-color-active) .team-switch-link:hover {
+    background-color: rgba(76, 175, 80, 0.2);
+}
+
+.selected-team {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+body:not(.team-color-active) .selected-team {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===============================
+   Button Month Navigation
+   =============================== */
+
+.btn-month {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* ===============================
+   Home Page Specific Styles
+   =============================== */
+
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.current-month {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/*.league-selection, .team-filter, .upcoming-matches {*/
+/*    margin: 30px 0;*/
+/*    padding: 20px;*/
+/*    background-color: #f9f9f9;*/
+/*    border-radius: 8px;*/
+/*}*/
+
+.league-buttons, .gender-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.btn-league, .btn-gender {
+    flex: 1;
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.team-select {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.match-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* ===============================
+   Game Details Page
+   =============================== */
+
+.match-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.match-header h2 {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.match-intro, .match-history {
+    margin-bottom: 30px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.history-table th, .history-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.history-table th {
+    background-color: #f5f5f5;
+}
+
+.history-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.lineup-container {
+    margin-top: 40px;
+}
+
+.team-headers {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 0 5%;
+}
+
+.home-header, .away-header {
+    width: 45%;
+}
+
+.away-header {
+    text-align: right;
+}
+
+.formation-badge {
+    background-color: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+.pitch {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    height: 650px;
+    margin: 0 auto;
+    background: #4CAF50;
+    border: 2px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.pitch-markings {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.halfway-line {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: white;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.center-circle {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid white;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.penalty-area {
+    position: absolute;
+    width: 150px;
+    height: 350px;
+    border: 2px solid white;
+}
+
+.penalty-area.home {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.penalty-area.away {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.goal-area {
+    position: absolute;
+    width: 60px;
+    height: 180px;
+    border: 2px solid white;
+}
+
+.goal-area.home {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.goal-area.away {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.player-card {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    z-index: 5;
+}
+
+.player-card:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.player-card.home {
+    background-color: rgba(25, 118, 210, 0.8);
+    color: white;
+}
+
+.player-card.away {
+    background-color: rgba(255, 87, 34, 0.8);
+    color: white;
+}
+
+.player-number {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.player-name {
+    font-size: 0.8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+}
+
+.player-name.empty {
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+/* ===============================
+   Match Detail Page
+   =============================== */
+
+.container.py-4 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.text-decoration-none {
+    text-decoration: none;
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    font-weight: bold;
+    background-color: white;
+    background-clip: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+}
+
+.card-header {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.bg-primary {
+    background-color: #0d6efd !important;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+.card-body .row .col-5 h3 {
+    color: black !important;
+}
+
+
+.text-center {
+    text-align: center !important;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(-1 * 0.5rem);
+    margin-right: calc(-0.5 * 0.5rem);
+    margin-left: calc(-0.5 * 0.5rem);
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.col-5 {
+    flex: 0 0 auto;
+    width: 41.66666667%;
+}
+
+.col-2 {
+    flex: 0 0 auto;
+    width: 16.66666667%;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem !important;
+}
+
+.display-4 {
+    font-size: calc(1.475rem + 2.7vw);
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+.small {
+    font-size: 0.875em;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.h4 {
+    font-size: calc(1.275rem + 0.3vw);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.card-footer {
+    padding: 0.5rem 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.justify-content-around {
+    justify-content: space-around !important;
+}
+
+.me-1 {
+    margin-right: 0.25rem !important;
+}
+
+.bg-dark {
+    background-color: #212529 !important;
+}
+
+.h5 {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    vertical-align: top;
+    border-color: #dee2e6;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.table-hover > tbody > tr:hover {
+    --bs-table-accent-bg: rgba(0, 0, 0, 0.075);
+    color: #212529;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.align-middle {
+    vertical-align: middle !important;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.bg-success {
+    background-color: #198754 !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.text-dark {
+    color: #212529 !important;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+.bg-info {
+    background-color: #0dcaf0 !important;
+}
+
+.alert {
+    position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-info {
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb;
+}
+
+/* ===============================
+   Tournament Detail Page
+   =============================== */
+
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.col-lg-8 {
+    flex: 0 0 auto;
+    width: 66.66666667%;
+}
+
+.col-lg-4 {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+}
+
+.table-dark {
+    --bs-table-bg: #212529;
+    --bs-table-striped-bg: #2c3034;
+    --bs-table-striped-color: #fff;
+    --bs-table-active-bg: #373b3e;
+    --bs-table-active-color: #fff;
+    --bs-table-hover-bg: #323539;
+    --bs-table-hover-color: #fff;
+    color: #fff;
+    border-color: #373b3e;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.py-3 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.fw-medium {
+    font-weight: 500 !important;
+}
+
+.ms-2 {
+    margin-left: 0.5rem !important;
+}
+
+.ms-1 {
+    margin-left: 0.25rem !important;
+}
+
+.py-2 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.px-2 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+.mx-1 {
+    margin-left: 0.25rem !important;
+    margin-right: 0.25rem !important;
+}
+
+.mt-1 {
+    margin-top: 0.25rem !important;
+}
+
+.list-group {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    margin-bottom: 0;
+    border-radius: 0.25rem;
+}
+
+.list-group-flush {
+    border-radius: 0;
+}
+
+.list-group-flush > .list-group-item {
+    border-width: 0 0 1px;
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #212529;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.small {
+    font-size: 0.875em;
+}
+
+/* ===============================
+   Tournament List Page
+   =============================== */
+
+.col-md-4 {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+}
+
+.h-100 {
+    height: 100% !important;
+}
+
+.card-title {
+    margin-bottom: 0.5rem;
+}
+
+.col-12 {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+/* ===============================
+   Game Day Staff Page
+   =============================== */
+
+.gameday-staff-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* ===============================
+   Welcome Page Styling
+   =============================== */
+
+.welcome-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #d32f2f;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-card {
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+}
+
+.team-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.team-selection-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #222;
+    border: 2px solid transparent;
+}
+
+.team-selection-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4);
+}
+
+.team-selection-item.active {
+    border-color: var(--team-primary);
+    background-color: rgba(var(--team-primary-rgb), 0.1);
+}
+
+.login-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #d32f2f;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #222;
+    color: white;
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    border-color: #d32f2f;
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+.welcome-btn {
+    flex: 1;
+    margin: 0 10px;
+}
+
+.welcome-btn.secondary {
+    background: transparent;
+    border: 2px solid #d32f2f;
+}
+
+.welcome-btn.secondary:hover {
+    background: rgba(211, 47, 47, 0.2);
+}
+
+@media (max-width: 768px) {
+    .team-selection-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .team-selection-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .welcome-btn {
+        margin: 5px 0;
+    }
+}
+
+
+/* Add these CSS styles to your main stylesheet or include in base.html */
+
+/* Standard team logo */
+.team-logo {
+    max-width: 40px;
+    max-height: 40px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* Small team logo for calendar days and lists */
+.team-logo-small {
+    max-width: 20px;
+    max-height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* Team logos in standings tables */
+.standings-team-logo {
+    max-width: 24px;
+    max-height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Team logo for team selection */
+.team-logo-preview {
+    max-width: 40px;
+    max-height: 40px;
+    margin-right: 10px;
+    object-fit: contain;
+}
+
+/* Match preview with logos */
+.match-preview {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+.vs-small {
+    margin: 0 4px;
+    font-size: 0.75rem;
+    color: #777;
+}
+
+/* Team cells in tables */
+.team-cell {
+    display: flex;
+    align-items: center;
+}
+
+/* For select2 integration if you decide to enhance the dropdowns */
+.select2-container--default .select2-selection--single {
+    display: flex;
+    align-items: center;
+}
+
+.select2-team-logo {
+    max-height: 24px;
+    max-width: 24px;
+    margin-right: 8px;
+}

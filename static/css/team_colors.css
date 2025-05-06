@@ -1,0 +1,952 @@
+/* ===============================
+   CSS Variable System for Team Colors
+   =============================== */
+
+:root {
+    /* Default theme colors (when no team is selected) */
+    --team-primary: #d32f2f;
+    --team-primary-rgb: 211, 47, 47;
+    --team-secondary: #222;
+    --team-secondary-rgb: 34, 34, 34;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* ===============================
+   Team-color-active Base Styles
+   =============================== */
+
+/* Global background - NOW USING TEAM COLORS */
+body.team-color-active {
+    background-color: var(--team-primary); /* Use team primary color as background */
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active h1,
+body.team-color-active h2,
+body.team-color-active h3,
+body.team-color-active p,
+body.team-color-active ul {
+    color: var(--team-text-on-primary); /* Text color that works on primary background */
+}
+
+body.team-color-active .container {
+    background-color: var(--team-primary); /* Container background matches body */
+}
+
+/* Content areas that need to be legible - keep these white/light */
+body.team-color-active .match-card,
+body.team-color-active .team-item,
+body.team-color-active .welcome-card,
+body.team-color-active .login-card,
+body.team-color-active .form-group input,
+body.team-color-active .user-dropdown {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    color: #333; /* Dark text for readability */
+}
+
+/* Table styling - keep white background for better readability */
+body.team-color-active table {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 1px solid var(--team-secondary);
+}
+
+body.team-color-active td {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+/* Table headers still use team secondary color */
+body.team-color-active th {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    border: 1px solid var(--team-secondary);
+}
+
+/* Navbar styling - make it use secondary color for contrast */
+body.team-color-active .navbar {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.team-color-active .navbar a {
+    color: var(--team-text-on-secondary);
+}
+
+/* Button colors - use secondary for buttons on primary background */
+body.team-color-active .btn {
+    background: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active .btn:hover {
+    background: var(--team-accent);
+    color: var(--team-text-on-primary);
+}
+
+/* Make text in cards readable */
+body.team-color-active .match-details,
+body.team-color-active .match-time,
+body.team-color-active .vs,
+body.team-color-active .confederation,
+body.team-color-active td p {
+    color: #333;
+}
+
+/* Match cards */
+body.team-color-active .match-card {
+    background-color: #fff;
+    border: 1px solid var(--team-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+body.team-color-active .match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active .match-details,
+body.team-color-active .match-time,
+body.team-color-active .vs,
+body.team-color-active .confederation {
+    color: #333;
+}
+
+body.team-color-active .match-link {
+    background: var(--team-primary);
+    color: var(--team-text-on-primary);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+body.team-color-active .match-link:hover {
+    background: var(--team-secondary);
+}
+
+/* Team selection link */
+body.team-color-active .team-switch-link {
+    background-color: rgba(var(--team-primary-rgb), 0.1);
+}
+
+body.team-color-active .team-switch-link:hover {
+    background-color: rgba(var(--team-primary-rgb), 0.2);
+}
+
+/* Month navigation */
+body.team-color-active .month-navigation .btn-month {
+    background: var(--team-primary);
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active .month-navigation .btn-month:hover {
+    background: var(--team-secondary);
+}
+
+/* Goal song button */
+body.team-color-active .goal-song-section {
+    background-color: #fff;
+    border: 1px solid var(--team-primary);
+}
+
+body.team-color-active #goal-song-button {
+    background: var(--team-primary);
+    color: var(--team-text-on-primary);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active #goal-song-button:hover {
+    background: var(--team-secondary);
+}
+
+body.team-color-active #goal-song-button.playing {
+    background: var(--team-secondary);
+}
+
+/* ===============================
+   Welcome Page Team-specific Styling
+   =============================== */
+
+/* Change welcome card background when team is selected */
+body.team-color-active .welcome-card {
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.team-color-active .welcome-title {
+    color: var(--team-primary);
+}
+
+body.team-color-active .team-selection-item {
+    background-color: #f9f9f9;
+}
+
+body.team-color-active .team-selection-item:hover {
+    box-shadow: 0 5px 15px rgba(var(--team-primary-rgb), 0.4);
+}
+
+body.team-color-active .team-logo-placeholder {
+    background-color: var(--team-primary);
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active .form-group label {
+    color: var(--team-primary);
+}
+
+body.team-color-active .form-group input {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #333;
+}
+
+body.team-color-active .form-group input:focus {
+    border-color: var(--team-primary);
+}
+
+body.team-color-active .welcome-btn.secondary {
+    border: 2px solid var(--team-primary);
+    color: var(--team-primary);
+}
+
+body.team-color-active .welcome-btn.secondary:hover {
+    background: rgba(var(--team-primary-rgb), 0.1);
+}
+
+/* ===============================
+   Team-specific color themes
+   =============================== */
+
+/* Afturelding - red and blue */
+.team-color-afturelding {
+    --team-primary: #d32f2f;
+    --team-primary-rgb: 211, 47, 47;
+    --team-secondary: #0047AB;
+    --team-secondary-rgb: 0, 71, 171;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* Breiðablik - green and white */
+.team-color-breiðablik {
+    --team-primary: #006400;
+    --team-primary-rgb: 0, 100, 0;
+    --team-secondary: #32CD32;
+    --team-secondary-rgb: 50, 205, 50;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #000;
+}
+
+/* FH - white and black */
+.team-color-fh {
+    --team-primary: #000;
+    --team-primary-rgb: 0, 0, 0;
+    --team-secondary: #333;
+    --team-secondary-rgb: 51, 51, 51;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* Fram - light blue and white */
+.team-color-fram {
+    --team-primary: #87CEFA;
+    --team-primary-rgb: 135, 206, 250;
+    --team-secondary: #1E90FF;
+    --team-secondary-rgb: 30, 144, 255;
+    --team-accent: #000;
+    --team-accent-rgb: 0, 0, 0;
+    --team-text-on-primary: #000;
+    --team-text-on-secondary: #fff;
+}
+
+/* IA - yellow and black */
+.team-color-ia {
+    --team-primary: #FFD700;
+    --team-primary-rgb: 255, 215, 0;
+    --team-secondary: #DAA520;
+    --team-secondary-rgb: 218, 165, 32;
+    --team-accent: #000;
+    --team-accent-rgb: 0, 0, 0;
+    --team-text-on-primary: #000;
+    --team-text-on-secondary: #fff;
+}
+
+/* IBV - black and white */
+.team-color-ibv {
+    --team-primary: #000;
+    --team-primary-rgb: 0, 0, 0;
+    --team-secondary: #333;
+    --team-secondary-rgb: 51, 51, 51;
+    --team-accent: #d32f2f;
+    --team-accent-rgb: 211, 47, 47;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* KA - red and blue */
+.team-color-ka {
+    --team-primary: #d32f2f;
+    --team-primary-rgb: 211, 47, 47;
+    --team-secondary: #0047AB;
+    --team-secondary-rgb: 0, 71, 171;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* kr - white and black */
+.team-color-kr {
+    --team-primary: #000;
+    --team-primary-rgb: 0, 0, 0;
+    --team-secondary: #333;
+    --team-secondary-rgb: 51, 51, 51;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* ===============================
+   Borders and UI Element Visibility Fixes
+   =============================== */
+
+/* Fix for calendar borders/lines */
+body.team-color-active #calendarTable,
+body.team-color-active #calendarTable th,
+body.team-color-active #calendarTable td {
+    border: 2px solid var(--team-secondary); /* Thicker, more visible borders */
+}
+
+/* Fix for league table borders */
+body.team-color-active .league-table,
+body.team-color-active .league-table th,
+body.team-color-active .league-table td {
+    border: 2px solid var(--team-secondary); /* Thicker, more visible borders */
+}
+
+/* Month navigation buttons - make more visible */
+body.team-color-active .btn-month {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 5px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    margin: 0 15px;
+    border: 2px solid var(--team-accent);
+}
+
+body.team-color-active .btn-month:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Team page buttons - make more visible */
+body.team-color-active .team-item,
+body.team-color-active .navigation-buttons .btn {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    border: 2px solid var(--team-accent);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.team-color-active .team-item:hover,
+body.team-color-active .navigation-buttons .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* User dropdown links - make more visible */
+body
+/* ===============================
+   CSS Variable System for Team Colors
+   =============================== */
+
+:root {
+    /* Default theme colors (when no team is selected) */
+    --team-primary: #d32f2f;
+    --team-primary-rgb: 211, 47, 47;
+    --team-secondary: #222;
+    --team-secondary-rgb: 34, 34, 34;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* ===============================
+   Team-color-active Base Styles
+   =============================== */
+
+/* Global background - NOW USING TEAM COLORS */
+body.team-color-active {
+    background-color: var(--team-primary); /* Use team primary color as background */
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active h1,
+body.team-color-active h2,
+body.team-color-active h3,
+body.team-color-active p,
+body.team-color-active ul {
+    color: var(--team-text-on-primary); /* Text color that works on primary background */
+}
+
+body.team-color-active .container {
+    background-color: var(--team-primary); /* Container background matches body */
+}
+
+/* Content areas that need to be legible - keep these white/light */
+body.team-color-active .match-card,
+body.team-color-active .team-item,
+body.team-color-active .welcome-card,
+body.team-color-active .login-card,
+body.team-color-active .form-group input,
+body.team-color-active .user-dropdown {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    color: #333; /* Dark text for readability */
+}
+
+/* Table styling - keep white background for better readability */
+body.team-color-active table {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 1px solid var(--team-secondary);
+}
+
+body.team-color-active td {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+/* Table headers still use team secondary color */
+body.team-color-active th {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    border: 1px solid var(--team-secondary);
+}
+
+/* Navbar styling - make it use secondary color for contrast */
+body.team-color-active .navbar {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.team-color-active .navbar a {
+    color: var(--team-text-on-secondary);
+}
+
+/* Button colors - use secondary for buttons on primary background */
+body.team-color-active .btn {
+    background: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active .btn:hover {
+    background: var(--team-accent);
+    color: var(--team-text-on-primary);
+}
+
+/* Make text in cards readable */
+body.team-color-active .match-details,
+body.team-color-active .match-time,
+body.team-color-active .vs,
+body.team-color-active .confederation,
+body.team-color-active td p {
+    color: #333;
+}
+
+/* Match cards */
+body.team-color-active .match-card {
+    background-color: #fff;
+    border: 1px solid var(--team-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+body.team-color-active .match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active .match-details,
+body.team-color-active .match-time,
+body.team-color-active .vs,
+body.team-color-active .confederation {
+    color: #333;
+}
+
+body.team-color-active .match-link {
+    background: var(--team-primary);
+    color: var(--team-text-on-primary);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+body.team-color-active .match-link:hover {
+    background: var(--team-secondary);
+}
+
+/* Team selection link */
+body.team-color-active .team-switch-link {
+    background-color: rgba(var(--team-primary-rgb), 0.1);
+}
+
+body.team-color-active .team-switch-link:hover {
+    background-color: rgba(var(--team-primary-rgb), 0.2);
+}
+
+/* Month navigation */
+body.team-color-active .month-navigation .btn-month {
+    background: var(--team-primary);
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active .month-navigation .btn-month:hover {
+    background: var(--team-secondary);
+}
+
+/* Goal song button */
+body.team-color-active .goal-song-section {
+    background-color: #fff;
+    border: 1px solid var(--team-primary);
+}
+
+body.team-color-active #goal-song-button {
+    background: var(--team-primary);
+    color: var(--team-text-on-primary);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active #goal-song-button:hover {
+    background: var(--team-secondary);
+}
+
+body.team-color-active #goal-song-button.playing {
+    background: var(--team-secondary);
+}
+
+/* ===============================
+   Welcome Page Team-specific Styling
+   =============================== */
+
+/* Change welcome card background when team is selected */
+body.team-color-active .welcome-card {
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.team-color-active .welcome-title {
+    color: var(--team-primary);
+}
+
+body.team-color-active .team-selection-item {
+    background-color: #f9f9f9;
+}
+
+body.team-color-active .team-selection-item:hover {
+    box-shadow: 0 5px 15px rgba(var(--team-primary-rgb), 0.4);
+}
+
+body.team-color-active .team-logo-placeholder {
+    background-color: var(--team-primary);
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active .form-group label {
+    color: var(--team-primary);
+}
+
+body.team-color-active .form-group input {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #333;
+}
+
+body.team-color-active .form-group input:focus {
+    border-color: var(--team-primary);
+}
+
+body.team-color-active .welcome-btn.secondary {
+    border: 2px solid var(--team-primary);
+    color: var(--team-primary);
+}
+
+body.team-color-active .welcome-btn.secondary:hover {
+    background: rgba(var(--team-primary-rgb), 0.1);
+}
+
+/* ===============================
+   Team-specific color themes
+   =============================== */
+
+/* Afturelding - red and blue */
+.team-color-afturelding {
+    --team-primary: #d32f2f;
+    --team-primary-rgb: 211, 47, 47;
+    --team-secondary: #0047AB;
+    --team-secondary-rgb: 0, 71, 171;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* Breiðablik - green and white */
+.team-color-breiðablik {
+    --team-primary: #006400;
+    --team-primary-rgb: 0, 100, 0;
+    --team-secondary: #32CD32;
+    --team-secondary-rgb: 50, 205, 50;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #000;
+}
+
+/* FH - white and black */
+.team-color-fh {
+    --team-primary: #000;
+    --team-primary-rgb: 0, 0, 0;
+    --team-secondary: #333;
+    --team-secondary-rgb: 51, 51, 51;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* Fram - light blue and white */
+.team-color-fram {
+    --team-primary: #87CEFA;
+    --team-primary-rgb: 135, 206, 250;
+    --team-secondary: #1E90FF;
+    --team-secondary-rgb: 30, 144, 255;
+    --team-accent: #000;
+    --team-accent-rgb: 0, 0, 0;
+    --team-text-on-primary: #000;
+    --team-text-on-secondary: #fff;
+}
+
+/* IA - yellow and black */
+.team-color-ia {
+    --team-primary: #FFD700;
+    --team-primary-rgb: 255, 215, 0;
+    --team-secondary: #DAA520;
+    --team-secondary-rgb: 218, 165, 32;
+    --team-accent: #000;
+    --team-accent-rgb: 0, 0, 0;
+    --team-text-on-primary: #000;
+    --team-text-on-secondary: #fff;
+}
+
+/* IBV - black and white */
+.team-color-ibv {
+    --team-primary: #000;
+    --team-primary-rgb: 0, 0, 0;
+    --team-secondary: #333;
+    --team-secondary-rgb: 51, 51, 51;
+    --team-accent: #d32f2f;
+    --team-accent-rgb: 211, 47, 47;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* KA - red and blue */
+.team-color-ka {
+    --team-primary: #d32f2f;
+    --team-primary-rgb: 211, 47, 47;
+    --team-secondary: #0047AB;
+    --team-secondary-rgb: 0, 71, 171;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* kr - white and black */
+.team-color-kr {
+    --team-primary: #000;
+    --team-primary-rgb: 0, 0, 0;
+    --team-secondary: #333;
+    --team-secondary-rgb: 51, 51, 51;
+    --team-accent: #fff;
+    --team-accent-rgb: 255, 255, 255;
+    --team-text-on-primary: #fff;
+    --team-text-on-secondary: #fff;
+}
+
+/* ===============================
+   Borders and UI Element Visibility Fixes
+   =============================== */
+
+/* Fix for calendar borders/lines */
+body.team-color-active #calendarTable,
+body.team-color-active #calendarTable th,
+body.team-color-active #calendarTable td {
+    border: 2px solid var(--team-secondary); /* Thicker, more visible borders */
+}
+
+/* Fix for league table borders */
+body.team-color-active .league-table,
+body.team-color-active .league-table th,
+body.team-color-active .league-table td {
+    border: 2px solid var(--team-secondary); /* Thicker, more visible borders */
+}
+
+/* Month navigation buttons - make more visible */
+body.team-color-active .btn-month {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 5px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    margin: 0 15px;
+    border: 2px solid var(--team-accent);
+}
+
+body.team-color-active .btn-month:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Team page buttons - make more visible */
+body.team-color-active .team-item,
+body.team-color-active .navigation-buttons .btn {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+    border: 2px solid var(--team-accent);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.team-color-active .team-item:hover,
+body.team-color-active .navigation-buttons .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* User dropdown links - make more visible */
+body.team-color-active .user-dropdown {
+    background-color: var(--team-secondary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--team-accent);
+}
+
+body.team-color-active .user-dropdown a {
+    color: var(--team-text-on-secondary);
+    font-weight: bold;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.team-color-active .user-dropdown a:hover {
+    background-color: var(--team-primary);
+}
+
+body.team-color-active .user-dropdown form {
+    padding: 10px;
+}
+
+body.team-color-active .user-dropdown button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--team-primary);
+    color: var(--team-text-on-primary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Make dropdown username more visible */
+body.team-color-active .dropdown-username {
+    display: block;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--team-text-on-secondary);
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Style the "Change Team" link specially to make it very visible */
+body.team-color-active .team-switch-link {
+    background-color: var(--team-primary);
+    color: var(--team-text-on-primary);
+    margin: 10px;
+    padding: 12px 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 2px solid var(--team-accent);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+body.team-color-active .team-switch-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.team-color-active .team-icon {
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+/* Make selected team badge more visible */
+body.team-color-active .selected-team {
+    background-color: var(--team-primary);
+    color: var(--team-text-on-primary);
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 30px;
+    border: 2px solid var(--team-accent);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Form related styling with team colors */
+body.team-color-active .form-control {
+    border-color: var(--team-secondary);
+}
+
+body.team-color-active .form-control:focus {
+    border-color: var(--team-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--team-primary-rgb), 0.25);
+}
+
+/* Badge styling for team colors */
+body.team-color-active .badge {
+    background-color: var(--team-secondary);
+}
+
+body.team-color-active .bg-secondary {
+    background-color: var(--team-secondary) !important;
+}
+
+body.team-color-active .bg-primary {
+    background-color: var(--team-primary) !important;
+}
+
+/* Card styling for team colors */
+body.team-color-active .card {
+    border-color: var(--team-secondary);
+}
+
+body.team-color-active .card-header {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+}
+
+body.team-color-active .card-footer {
+    background-color: rgba(var(--team-secondary-rgb), 0.1);
+}
+
+/* Alert styling */
+body.team-color-active .alert-info {
+    background-color: rgba(var(--team-primary-rgb), 0.1);
+    border-color: var(--team-secondary);
+    color: var(--team-text-on-primary);
+}
+
+/* Team selector styling */
+body.team-color-active .team-selector .form-control {
+    border-color: var(--team-secondary);
+    background-color: white;
+    color: #333;
+}
+
+body.team-color-active .team-selector .form-control:focus {
+    border-color: var(--team-primary);
+}
+
+/* Team calendar specific styles */
+body.team-color-active .team-calendar-header {
+    border-bottom: 2px solid var(--team-secondary);
+    padding-bottom: 10px;
+}
+
+body.team-color-active .filter-toggle-container label {
+    color: var(--team-text-on-primary);
+}
+
+/* Calendar day styling with team colors */
+body.team-color-active .day-header {
+    color: var(--team-text-on-primary);
+}
+
+body.team-color-active .matches-preview {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+}
+
+body.team-color-active .match-preview {
+    color: #333;
+}
+
+body.team-color-active .view-day-matches {
+    color: var(--team-primary);
+    background-color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+body.team-color-active .view-day-matches:hover {
+    background-color: var(--team-primary);
+    color: var(--team-text-on-primary);
+}
+
+/* Modal styling for team colors */
+body.team-color-active .modal-content {
+    border-color: var(--team-secondary);
+}
+
+body.team-color-active .modal-title {
+    color: var(--team-primary);
+}
+
+body.team-color-active .close {
+    color: var(--team-primary);
+}
+
+/* Calendar table navigation elements */
+body.team-color-active .full-calendar th {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+}
+
+body.team-color-active .has-matches {
+    background-color: rgba(var(--team-primary-rgb), 0.1);
+}
+
+/* League table with team colors */
+body.team-color-active .league-table th {
+    background-color: var(--team-secondary);
+    color: var(--team-text-on-secondary);
+}
+
+/* Match details styling */
+body.team-color-active .confederation,
+body.team-color-active .tournament {
+    color: var(--team-primary);
+}

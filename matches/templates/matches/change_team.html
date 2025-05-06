@@ -1,0 +1,100 @@
+{% extends 'matches/base.html' %}
+{% block content %}
+<div class="team-selection-container">
+    <h2>Change Your Team</h2>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" action="{% url 'change_team' %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+    <label for="team-select">Select Your Team:</label>
+    <select id="team-select" name="selected_team" required>
+        <option value="">-- Select a team --</option>
+        {% for team in teams %}
+            {% if team.visibility.visible_to_users %}
+                <option value="{{ team.team_number }}"
+                        {% if team.team_number == request.session.selected_team_id %}selected{% endif %}
+                        data-logo="{% if team.logo %}{{ team.logo.url }}{% endif %}">
+                    {{ team.name }}
+                </option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <div id="selected-team-preview" class="team-preview">
+        <img id="selected-team-logo" class="team-logo-preview" src="" alt="" style="display: none;">
+        <span id="selected-team-name"></span>
+    </div>
+</div>
+
+        
+        <div class="team-select-info">
+            <p>Selecting a team will personalize your experience and apply team colors to the interface.</p>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Update Team</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const teamSelect = document.getElementById('team-select');
+        const teamLogo = document.getElementById('selected-team-logo');
+        const teamName = document.getElementById('selected-team-name');
+
+        // Initial update
+        updateTeamPreview();
+
+        // Update on change
+        teamSelect.addEventListener('change', updateTeamPreview);
+
+        function updateTeamPreview() {
+            const selectedOption = teamSelect.options[teamSelect.selectedIndex];
+            const logoUrl = selectedOption.getAttribute('data-logo');
+
+            if (selectedOption.value) {
+                teamName.textContent = selectedOption.text;
+
+                if (logoUrl) {
+                    teamLogo.src = logoUrl;
+                    teamLogo.alt = selectedOption.text;
+                    teamLogo.style.display = 'inline-block';
+                } else {
+                    teamLogo.style.display = 'none';
+                }
+            } else {
+                teamName.textContent = 'No team selected';
+                teamLogo.style.display = 'none';
+            }
+        }
+    });
+</script>
+
+<!-- Add some CSS for the team preview -->
+<style>
+    .team-preview {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+    }
+
+    .team-logo-preview {
+        max-width: 40px;
+        max-height: 40px;
+        margin-right: 10px;
+    }
+</style>

@@ -1,0 +1,13 @@
+<h2>Gameday Instructions</h2>
+<ul>
+    {% for text in texts %}
+        <li>{{ text.time_offset }} minutes before: {{ text.action }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Goal Celebration Song</h3>
+<button onclick="document.getElementById('goal-song').play()">Play Song</button>
+<audio id="goal-song">
+    <source src="/static/songs/goal_song.mp3" type="audio/mpeg">
+</audio>
+

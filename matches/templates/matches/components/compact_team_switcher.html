@@ -1,0 +1,122 @@
+<div class="team-switcher">
+  <div class="current-team">
+    <div class="team-icon">
+      {% if team.logo %}
+        <img src="{{ team.logo.url }}" alt="{{ team.name }}" class="team-icon-img">
+      {% else %}
+        <div class="team-icon-placeholder">{{ team.name|slice:":1" }}</div>
+      {% endif %}
+    </div>
+    <div class="team-info">
+      <div class="team-name">{{ team.name }}</div>
+      <button id="change-team-btn" class="btn-change-team">Change Team</button>
+    </div>
+  </div>
+
+  {% if recent_teams %}
+  <div class="recent-teams">
+    <h4>Recently Viewed</h4>
+    <div class="recent-teams-list">
+      {% for recent_team in recent_teams %}
+        {% if recent_team.team_number != team.team_number %}
+        <a href="{% url 'team_calendar' %}?team_id={{ recent_team.team_number }}&month={{ month }}&year={{ year }}"
+           class="recent-team-item">
+          {% if recent_team.logo %}
+            <img src="{{ recent_team.logo.url }}" alt="{{ recent_team.name }}" class="recent-team-logo">
+          {% else %}
+            <div class="recent-team-placeholder">{{ recent_team.name|slice:":1" }}</div>
+          {% endif %}
+          <span>{{ recent_team.name }}</span>
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div id="team-search-panel" class="team-search-panel">
+    <div class="search-header">
+      <input type="text" id="quick-team-search" placeholder="Search teams..." class="form-control">
+      <button id="close-search" class="btn-close-search">&times;</button>
+    </div>
+
+    <div id="search-results" class="search-results"></div>
+
+    <div class="view-all-teams">
+      <a href="{% url 'team_calendar' %}?month={{ month }}&year={{ year }}" class="btn btn-outline-primary btn-sm">
+        View All Teams
+      </a>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const changeTeamBtn = document.getElementById('change-team-btn');
+    const searchPanel = document.getElementById('team-search-panel');
+    const closeSearchBtn = document.getElementById('close-search');
+    const quickSearch = document.getElementById('quick-team-search');
+    const searchResults = document.getElementById('search-results');
+
+    // Toggle search panel
+    changeTeamBtn.addEventListener('click', function() {
+      searchPanel.style.display = searchPanel.style.display === 'block' ? 'none' : 'block';
+      if (searchPanel.style.display === 'block') {
+        quickSearch.focus();
+      }
+    });
+
+    closeSearchBtn.addEventListener('click', function() {
+      searchPanel.style.display = 'none';
+    });
+
+    // Handle quick search
+    quickSearch.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+
+      if (searchTerm.length < 2) {
+        searchResults.innerHTML = '<p class="text-muted text-center p-2">Type at least 2 characters to search</p>';
+        return;
+      }
+
+      // AJAX search request
+      fetch(`/api/search-teams/?q=${searchTerm}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.teams.length === 0) {
+            searchResults.innerHTML = '<p class="text-muted text-center p-2">No teams found</p>';
+            return;
+          }
+
+          let html = '';
+          data.teams.forEach(team => {
+            html += `
+              <a href="{% url 'team_calendar' %}?team_id=${team.team_number}&month={{ month }}&year={{ year }}"
+                 class="team-result-item">
+                ${team.logo ?
+                  `<img src="${team.logo}" alt="${team.name}" class="team-result-logo">` :
+                  `<div class="team-result-placeholder">${team.name.charAt(0)}</div>`
+                }
+                <span>${team.name}</span>
+              </a>
+            `;
+          });
+
+          searchResults.innerHTML = html;
+        })
+        .catch(error => {
+          console.error('Error searching teams:', error);
+          searchResults.innerHTML = '<p class="text-danger text-center p-2">Error searching teams</p>';
+        });
+    });
+
+    // Close search panel when clicking outside
+    document.addEventListener('click', function(event) {
+      if (!searchPanel.contains(event.target) && event.target !== changeTeamBtn) {
+        searchPanel.style.display = 'none';
+      }
+    });
+  });
+</script>

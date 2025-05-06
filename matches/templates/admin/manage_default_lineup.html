@@ -1,0 +1,250 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h2>Default Lineup for {{ team.name }} ({{ formation }})</h2>
+
+<div class="pitch-container">
+    <div class="pitch">
+        <div class="pitch-markings">
+            <div class="halfway-line"></div>
+            <div class="center-circle"></div>
+            <div class="penalty-area home"></div>
+            <div class="goal-area home"></div>
+            <div class="penalty-area away"></div>
+            <div class="goal-area away"></div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% for slot in position_slots %}
+                <div class="player-slot" id="position-{{ slot.position_number }}" style="position: absolute;">
+<select name="player_{{ slot.position_number }}">
+    <option value="none">-- Select {{ slot.position_type }} --</option>
+
+    <!-- Players with this position as primary -->
+    <optgroup label="Primary {{ slot.position_type }}">
+    {% for player in players %}
+        {% if player.position == slot.position_type %}
+            <option value="{{ player.id }}"
+                {% if slot.assigned_player and slot.assigned_player.id == player.id %}selected{% endif %}>
+                {{ player.first_name }} {{ player.last_name }}
+            </option>
+        {% endif %}
+    {% endfor %}
+    </optgroup>
+
+    <!-- Players with this position as secondary -->
+    <optgroup label="Secondary {{ slot.position_type }}">
+    {% for player in players %}
+        {% if player.secondary_position == slot.position_type %}
+            <option value="{{ player.id }}"
+                {% if slot.assigned_player and slot.assigned_player.id == player.id %}selected{% endif %}>
+                {{ player.first_name }} {{ player.last_name }}
+            </option>
+        {% endif %}
+    {% endfor %}
+    </optgroup>
+
+    <!-- Players with this position as third -->
+    <optgroup label="Third {{ slot.position_type }}">
+    {% for player in players %}
+        {% if player.third_position == slot.position_type %}
+            <option value="{{ player.id }}"
+                {% if slot.assigned_player and slot.assigned_player.id == player.id %}selected{% endif %}>
+                {{ player.first_name }} {{ player.last_name }}
+            </option>
+        {% endif %}
+    {% endfor %}
+    </optgroup>
+</select>                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="save-btn">Save Default Lineup</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Pitch styling (similar to your edit_formation.html) */
+    .pitch-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 650px;
+    }
+
+    .pitch {
+        position: relative;
+        width: 90%;
+        max-width: 900px;
+        height: 650px;
+        margin: 0 auto;
+        background: #4CAF50;
+        border: 2px solid white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .pitch-markings {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Center Line */
+    .halfway-line {
+        position: absolute;
+        width: 2px;
+        height: 100%;
+        background: white;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* Center Circle */
+    .center-circle {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border: 2px solid white;
+        border-radius: 50%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Penalty Areas */
+    .penalty-area {
+        position: absolute;
+        width: 150px;
+        height: 350px;
+        border: 2px solid white;
+    }
+
+    .penalty-area.home {
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .penalty-area.away {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Goal Areas */
+    .goal-area {
+        position: absolute;
+        width: 60px;
+        height: 180px;
+        border: 2px solid white;
+    }
+
+    .goal-area.home {
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .goal-area.away {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Player slot styling */
+    .player-slot {
+        position: absolute;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        z-index: 10;
+    }
+
+    .player-slot select {
+        width: 150px;
+        padding: 6px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .form-actions {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .save-btn {
+        padding: 8px 16px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .save-btn:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Position the player slots based on formation
+    positionSlots("{{ formation }}");
+});
+
+function positionSlots(formation) {
+    const positions = calculatePositions(formation);
+
+    for (let i = 1; i <= 11; i++) {
+        const slotElem = document.getElementById(`position-${i}`);
+        if (slotElem && positions[i]) {
+            slotElem.style.left = positions[i].x + '%';
+            slotElem.style.top = positions[i].y + '%';
+        }
+    }
+}
+
+function calculatePositions(formation) {
+    const positions = {};
+    const parts = formation.split('-');
+
+    // Process formations like 4-4-2, 4-3-3, etc.
+    let totalPlayers = 0;
+    const lines = [];
+
+    // Goalkeeper is always position 1
+    positions[1] = { x: 5, y: 46 };
+    totalPlayers = 1;
+
+    // Add each line from the formation
+    for (let i = 0; i < parts.length; i++) {
+        const count = parseInt(parts[i]);
+        lines.push({ count, startPos: totalPlayers + 1 });
+        totalPlayers += count;
+    }
+
+    // Calculate positions for each line
+    lines.forEach((line, idx) => {
+        const xRange = 80; // Use full width of the pitch
+        const depth = 15 + (idx + 1) * (xRange / (lines.length + 1));
+
+        for (let i = 0; i < line.count; i++) {
+            const spacing = 80 / (line.count + 1);
+            const yPos = (i + 1) * spacing + 10;
+            positions[line.startPos + i] = { x: depth, y: yPos };
+        }
+    });
+
+    return positions;
+}
+</script>
+{% endblock %}

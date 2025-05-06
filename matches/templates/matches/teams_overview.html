@@ -1,0 +1,35 @@
+{% extends 'matches/base.html' %}
+
+{% block title %}Teams Overview{% endblock %}
+
+{% block content %}
+    <h2>{{ category|capfirst }} Teams</h2>
+    
+<div class="team-grid">
+{% for team in teams %}
+    {% if team.visibility.visible_to_users %}
+        <option value="{{ team.team_number }}">{{ team.name }}</option>
+    {% endif %}
+<div class="team-item">
+  <a href="{% url 'team_details' team.id %}">
+    {% if team.logo %}
+      <img src="{{ team.logo.url }}" alt="{{ team.name }}" class="team-logo">
+    {% else %}
+      <div class="default-logo">{{ team.name|first }}</div>
+    {% endif %}
+    <p class="team-name">{{ team.name }} </p>
+  </a>
+</div>
+{% endfor %}
+
+   <h3>KSI Teams</h3>
+    {% for team in ksi_teams %}
+    <div class="team-item ksi-team">
+        <a href="{% url 'team_detail' team.team_number %}">
+            <div class="default-logo">{{ team.name|first }}</div>
+            <p class="team-name">{{ team.name }}</p>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

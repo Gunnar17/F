@@ -1,0 +1,635 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h2>Formation: {{ game.home_team.name }} <span id="home-formation-display">{{ home_formation }}</span>
+    vs {{ game.away_team.name }} (<span id="away-formation-display">{{ away_formation }}</span>)
+</h2>
+
+<!-- Pitch Container -->
+<div class="pitch-container">
+    <div class="pitch">
+        <div class="pitch-markings">
+            <div class="halfway-line"></div>
+            <div class="center-circle"></div>
+            <div class="penalty-area home"></div>
+            <div class="goal-area home"></div>
+            <div class="penalty-area away"></div>
+            <div class="goal-area away"></div>
+        </div>
+
+        <!-- Home Team Players (left side) -->
+        {% for slot in home_lineup %}
+            {% if forloop.counter <= 11 %}
+                <button id="home_{{ slot.position_number }}"
+                        class="player-btn home"
+                        data-lineup-id="{{ slot.id }}"
+                        data-team-id="{{ game.home_team.team_number }}"
+                        data-position-number="{{ slot.position_number }}"
+                        {% if slot.player %}data-player-id="{{ slot.player.player_number }}"{% endif %}>
+                    {% if slot.player %}
+                        {{ slot.player.name }}
+                    {% else %}
+                        P{{ slot.position_number }}
+                    {% endif %}
+                </button>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Away Team Players (right side) -->
+        {% for slot in away_lineup %}
+            {% if forloop.counter <= 11 %}
+                <button id="away_{{ slot.position_number }}"
+                        class="player-btn away"
+                        data-lineup-id="{{ slot.id }}"
+                        data-team-id="{{ game.away_team.team_number }}"
+                        data-position-number="{{ slot.position_number }}"
+                        {% if slot.player %}data-player-id="{{ slot.player.player_number }}"{% endif %}>
+                    {% if slot.player %}
+                        {{ slot.player.name }}
+                    {% else %}
+                        P{{ slot.position_number }}
+                    {% endif %}
+                </button>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Formation Controls -->
+<div class="formation-controls">
+    <h3>Update Team Formations</h3>
+    <form method="POST" action="{% url 'update_formations' game.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Home Team Formation:</label>
+            <select name="home_formation" id="formation-selector-home">
+                {% for formation in formation_choices %}
+                    <option value="{{ formation.0 }}" {% if formation.0 == home_formation %}selected{% endif %}>
+                        {{ formation.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Away Team Formation:</label>
+            <select name="away_formation" id="formation-selector-away">
+                {% for formation in formation_choices %}
+                    <option value="{{ formation.0 }}" {% if formation.0 == away_formation %}selected{% endif %}>
+                        {{ formation.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Formations</button>
+    </form>
+</div>
+
+<!-- Player Selection Modal -->
+<div id="player-selection" class="modal">
+    <div class="modal-content">
+        <h3>Select a Player</h3>
+<form method="POST" action="{% url 'assign_player' %}">
+            {% csrf_token %}
+            <input type="hidden" id="lineup-id" name="lineup_id">
+            <input type="hidden" id="position-number" name="position_number">
+            <select id="player-dropdown" name="player_number" class="form-control">
+                <option value="">Select a player</option>
+            </select>
+            <br><br>
+            <button type="submit" class="btn btn-primary">Assign Player</button>
+            <button type="button" class="btn btn-secondary" onclick="closePlayerSelection()">Cancel</button>
+        </form>
+    </div>
+</div>
+<style>
+    /* Pitch Styling */
+    .pitch-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 650px;
+        margin: 20px 0;
+    }
+
+    .pitch {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        height: 650px;
+        margin: 0 auto;
+        background: #4CAF50;
+        border: 2px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .pitch-markings {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .halfway-line {
+        position: absolute;
+        width: 2px;
+        height: 100%;
+        background: white;
+        left: 50%;
+    }
+
+    .center-circle {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border: 2px solid white;
+        border-radius: 50%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .penalty-area {
+        position: absolute;
+        width: 150px;
+        height: 350px;
+        border: 2px solid white;
+    }
+
+    .penalty-area.home {
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .penalty-area.away {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .goal-area {
+        position: absolute;
+        width: 60px;
+        height: 180px;
+        border: 2px solid white;
+    }
+
+    .goal-area.home {
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .goal-area.away {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .player-btn {
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        font-size: 12px;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        word-break: break-word;
+        padding: 2px;
+        transition: all 0.3s ease;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        border: 3px solid white;
+    }
+
+    .player-btn:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+        z-index: 20;
+    }
+
+    .player-btn.home {
+        background-color: #0000ff;
+        color: white;
+        left: 15%;
+    }
+
+    .player-btn.away {
+        background-color: #ff0000;
+        color: white;
+        left: 85%;
+    }
+
+    /* Formation Controls */
+    .formation-controls {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #f8f8f8;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: inline-block;
+        width: 150px;
+        font-weight: bold;
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Initializing formations...");
+
+    // Initialize formations
+    positionPlayers(document.getElementById("formation-selector-home").value, "home");
+    positionPlayers(document.getElementById("formation-selector-away").value, "away");
+
+    // Formation change listeners
+    document.getElementById("formation-selector-home").addEventListener("change", function() {
+        console.log("Home formation changed to:", this.value);
+        positionPlayers(this.value, "home");
+        document.getElementById("home-formation-display").innerText = this.value;
+    });
+
+    document.getElementById("formation-selector-away").addEventListener("change", function() {
+        console.log("Away formation changed to:", this.value);
+        positionPlayers(this.value, "away");
+        document.getElementById("away-formation-display").innerText = this.value;
+    });
+
+    // Player button click handlers
+    document.querySelectorAll(".player-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            const lineupId = this.getAttribute("data-lineup-id");
+            const teamId = this.getAttribute("data-team-id");
+            const positionNumber = this.getAttribute("data-position-number");
+            openPlayerSelection(lineupId, teamId, positionNumber);
+        });
+    });
+});
+
+function positionPlayers(formation, team) {
+    console.log(`Positioning ${team} team with formation ${formation}`);
+    const positions = calculatePositions(formation, team);
+    console.log("Calculated positions:", positions);
+
+    const playerButtons = document.querySelectorAll(`.player-btn.${team}`);
+    console.log(`Found ${playerButtons.length} buttons for ${team} team`);
+
+    playerButtons.forEach(button => {
+        const posNumber = button.getAttribute("data-position-number");
+        console.log(`Positioning ${team} player ${posNumber}`);
+
+        if (positions[posNumber]) {
+            console.log(`Setting position ${posNumber} to x:${positions[posNumber].x}%, y:${positions[posNumber].y}%`);
+            button.style.left = positions[posNumber].x + '%';
+            button.style.top = positions[posNumber].y + '%';
+        } else {
+            console.warn(`No position found for ${team} player ${posNumber}`);
+        }
+    });
+}
+
+function calculatePositions(formation, team) {
+    console.log(`Calculating positions for ${team} with ${formation}`);
+    const positions = {};
+    const parts = formation.split('-').map(Number);
+    const isHome = team === 'home';
+
+    // Configuration with strict boundaries
+    const config = {
+        home: {
+            boundaries: { minX: 5, maxX: 50 },
+            layers: [
+                { x: 10 },  // Goalkeeper
+                { x: 20 },  // Defenders
+                { x: 30 },  // Defensive midfielders
+                { x: 40 },  // Midfielders
+                { x: 45 }   // Attackers
+            ]
+        },
+        away: {
+            boundaries: { minX: 50, maxX: 95 },
+            layers: [
+                { x: 90 },  // Goalkeeper
+                { x: 80 },  // Defenders
+                { x: 70 },  // Defensive midfielders
+                { x: 60 },  // Midfielders
+                { x: 55 }   // Attackers
+            ]
+        }
+    };
+    const teamConfig = config[team];
+    const verticalBase = 20;
+    const verticalSpacing = 60;
+    const pitchCenterY = 50;
+
+    // Goalkeeper (always position 1)
+    positions[1] = {
+        x: teamConfig.layers[0].x,
+        y: pitchCenterY  // Centered vertically
+    };
+
+    let currentPosition = 2;
+    let layerIndex = 1;
+
+    // Process each formation part (except last which is forwards)
+    for (let i = 0; i < parts.length - 1; i++) {
+        const playersInLine = parts[i];
+
+        // Calculate X position for this line
+        let xPos;
+        if (layerIndex < teamConfig.layers.length) {
+            xPos = teamConfig.layers[layerIndex].x;
+        } else {
+            const lastLayerX = teamConfig.layers[teamConfig.layers.length - 2].x;
+            const attackX = teamConfig.layers[teamConfig.layers.length - 1].x;
+            xPos = lastLayerX + ((attackX - lastLayerX) * (layerIndex - teamConfig.layers.length + 2) / 2);
+        }
+
+        // Ensure we don't cross boundaries
+        xPos = isHome ?
+            Math.min(xPos, teamConfig.boundaries.maxX - 5) :
+            Math.max(xPos, teamConfig.boundaries.minX + 5);
+
+        // Position players in this line
+        if (playersInLine === 1) {
+            // Single player - center vertically
+            positions[currentPosition++] = {
+                x: xPos,
+                y: pitchCenterY
+            };
+        } else {
+            // Multiple players - distribute vertically
+            for (let j = 0; j < playersInLine; j++) {
+                positions[currentPosition++] = {
+                    x: xPos,
+                    y: verticalBase + (j * (verticalSpacing / (playersInLine - 1)))
+                };
+            }
+        }
+
+        layerIndex++;
+    }
+
+    // Forwards (last formation part)
+    const forwards = parts[parts.length - 1];
+    const forwardX = isHome ?
+        Math.min(teamConfig.layers[teamConfig.layers.length - 1].x, teamConfig.boundaries.maxX - 5) :
+        Math.max(teamConfig.layers[teamConfig.layers.length - 1].x, teamConfig.boundaries.minX + 5);
+
+    if (forwards === 1) {
+        // Single forward - center vertically
+        positions[currentPosition++] = {
+            x: forwardX,
+            y: pitchCenterY
+        };
+    } else {
+        // Multiple forwards - distribute vertically
+        for (let i = 0; i < forwards; i++) {
+            positions[currentPosition++] = {
+                x: forwardX,
+                y: verticalBase + (i * (verticalSpacing / (forwards - 1)))
+            };
+        }
+    }
+
+    console.log("Final positions:", positions);
+    return positions;
+}
+
+// Rest of your functions (openPlayerSelection, closePlayerSelection, getPositionType) remain the same
+// Add this to your existing JavaScript
+function openPlayerSelection(lineupId, teamId, positionNumber) {
+    const modal = document.getElementById("player-selection");
+    const dropdown = document.getElementById("player-dropdown");
+
+    // Get the current formation for this team
+    const formation = teamId === "{{ game.home_team.team_number }}" ?
+        document.getElementById("formation-selector-home").value :
+        document.getElementById("formation-selector-away").value;
+
+    // Determine position type (GK, DEF, MID, FW)
+    const positionType = getPositionType(positionNumber, formation);
+
+    // Set hidden form values
+    document.getElementById("lineup-id").value = lineupId;
+    document.getElementById("position-number").value = positionNumber;
+
+    // Clear existing options
+    dropdown.innerHTML = '<option value="">Select a player</option>';
+
+    // Get all players for this team
+    const players = teamId === "{{ game.home_team.team_number }}" ?
+        {{ home_players|safe }} :
+        {{ away_players|safe }};
+
+    // Get currently assigned players (to exclude them from dropdown)
+    const assignedPlayers = getAssignedPlayers(teamId);
+
+    // Filter and sort players by position relevance
+    const sortedPlayers = sortPlayersByPosition(players, positionType, assignedPlayers);
+
+    // Populate dropdown
+    populatePlayerDropdown(dropdown, sortedPlayers, positionType);
+
+    // Show modal
+    modal.style.display = "block";
+}
+
+function getAssignedPlayers(teamId) {
+    const assignedPlayers = [];
+    const prefix = teamId === "{{ game.home_team.team_number }}" ? "home_" : "away_";
+
+    for (let i = 1; i <= 11; i++) {
+        const button = document.getElementById(`${prefix}${i}`);
+        if (button && button.dataset.playerId) {
+            assignedPlayers.push(parseInt(button.dataset.playerId));
+        }
+    }
+    return assignedPlayers;
+}
+
+function sortPlayersByPosition(players, positionType, assignedPlayers) {
+    const primary = [];
+    const secondary = [];
+    const other = [];
+
+    players.forEach(player => {
+        // Skip already assigned players
+        if (assignedPlayers.includes(player.player_number)) return;
+
+        if (player.position === positionType) {
+            primary.push(player);
+        } else if (player.secondary_position === positionType) {
+            secondary.push(player);
+        } else if (player.third_position === positionType) {
+            secondary.push(player);
+        } else {
+            other.push(player);
+        }
+    });
+
+    return [...primary, ...secondary, ...other];
+}
+
+function populatePlayerDropdown(dropdown, players, positionType) {
+    if (players.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No available players";
+        option.disabled = true;
+        dropdown.appendChild(option);
+        return;
+    }
+
+    // Add primary position players
+    if (players.some(p => p.position === positionType)) {
+        const group = document.createElement("optgroup");
+        group.label = `Primary ${positionType}`;
+        players.filter(p => p.position === positionType).forEach(player => {
+            const option = document.createElement("option");
+            option.value = player.player_number;
+            option.textContent = `${player.name} (${player.player_number})`;
+            group.appendChild(option);
+        });
+        dropdown.appendChild(group);
+    }
+
+    // Add secondary position players
+    if (players.some(p => p.secondary_position === positionType)) {
+        const group = document.createElement("optgroup");
+        group.label = `Secondary ${positionType}`;
+        players.filter(p => p.secondary_position === positionType).forEach(player => {
+            const option = document.createElement("option");
+            option.value = player.player_number;
+            option.textContent = `${player.name} (${player.player_number})`;
+            group.appendChild(option);
+        });
+        dropdown.appendChild(group);
+    }
+
+    // Add other players
+    const otherPlayers = players.filter(p =>
+        p.position !== positionType &&
+        p.secondary_position !== positionType &&
+        (!p.third_position || p.third_position !== positionType)
+    );
+
+    if (otherPlayers.length > 0) {
+        const group = document.createElement("optgroup");
+        group.label = "Other Players";
+        otherPlayers.forEach(player => {
+            const option = document.createElement("option");
+            option.value = player.player_number;
+            option.textContent = `${player.name} (${player.player_number})`;
+            group.appendChild(option);
+        });
+        dropdown.appendChild(group);
+    }
+}
+
+// Update your existing position type function
+function getPositionType(positionNumber, formation) {
+    if (positionNumber == 1) return 'GK';
+
+    const parts = formation.split('-').map(Number);
+    let position = 2; // Start after goalkeeper
+
+    // Defenders
+    if (positionNumber < position + parts[0]) return 'DEF';
+    position += parts[0];
+
+    // Midfielders (handle multiple midfield lines)
+    for (let i = 1; i < parts.length - 1; i++) {
+        if (positionNumber < position + parts[i]) return 'MID';
+        position += parts[i];
+    }
+
+    // Forwards
+    return 'FW';
+}
+
+// Add this to your form submission handling
+document.querySelector("#player-selection form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const lineupId = document.getElementById("lineup-id").value;
+    const playerNumber = document.getElementById("player-dropdown").value;
+    const positionNumber = document.getElementById("position-number").value;
+    const teamId = document.querySelector(`button[data-lineup-id="${lineupId}"]`).dataset.teamId;
+
+    if (!playerNumber) {
+        alert("Please select a player");
+        return;
+    }
+
+    // Update the button appearance
+    const button = document.querySelector(`button[data-lineup-id="${lineupId}"]`);
+    const playerName = document.getElementById("player-dropdown").options[document.getElementById("player-dropdown").selectedIndex].text;
+
+    button.textContent = playerName.split(" (")[0]; // Remove player number from display
+    button.dataset.playerId = playerNumber;
+
+    // Close modal
+    closePlayerSelection();
+
+    // Submit the form via AJAX
+    const formData = new FormData(this);
+
+    fetch("{% url 'assign_player' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    }).then(data => {
+        if (data.success) {
+            // Player assigned successfully
+        } else {
+            alert("Error assigning player: " + data.error);
+        }
+    }).catch(error => {
+        console.error("Error:", error);
+        alert("Error assigning player");
+    });
+});
+</script>
+{% endblock %}

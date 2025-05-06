@@ -1,0 +1,67 @@
+{% extends 'predictions/base.html' %}
+
+{% block content %}
+<div class="new-prediction-container">
+    <h1>New Match Prediction</h1>
+
+    <div class="prediction-form-container">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                {{ form.game }}
+                <div class="team-selection">
+                    <div class="home-team">
+                        <label for="{{ form.home_team.id_for_label }}">Home Team</label>
+                        {{ form.home_team }}
+                        {% if form.home_team.errors %}
+                        <div class="form-error">{{ form.home_team.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="vs-indicator">vs</div>
+
+                    <div class="away-team">
+                        <label for="{{ form.away_team.id_for_label }}">Away Team</label>
+                        {{ form.away_team }}
+                        {% if form.away_team.errors %}
+                        <div class="form-error">{{ form.away_team.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.match_date.id_for_label }}">Match Date</label>
+                {{ form.match_date }}
+                {% if form.match_date.errors %}
+                <div class="form-error">{{ form.match_date.errors }}</div>
+                {% endif %}
+                <div class="form-help">Optional: Provide a date for this match if it's not already scheduled</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.model.id_for_label }}">Prediction Model</label>
+                {{ form.model }}
+                {% if form.model.errors %}
+                <div class="form-error">{{ form.model.errors }}</div>
+                {% endif %}
+                <div class="form-help">{{ form.model.help_text }}</div>
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn btn-primary">Generate Prediction</button>
+                <a href="{% url 'predictions_home' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

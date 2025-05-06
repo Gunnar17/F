@@ -1,0 +1,102 @@
+{% extends 'matches/base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="welcome-container">
+    <h1 class="welcome-title">Velkominn á Leikdag</h1>
+
+    <div class="welcome-card">
+        <h2>Veldu þitt lið</h2>
+
+        <div class="team-selection-grid">
+            {% for team in teams %}
+                {% if team.visibility.visible_to_users %}
+                    <option value="{{ team.team_number }}">{{ team.name }}</option>
+                {% endif %}
+            <div class="team-selection-item">
+                {% if team.logo %}
+                <img src="{{ team.logo.url }}" alt="{{ team.name }}" class="team-logo">
+                {% else %}
+                <div class="team-logo-placeholder">{{ team.name|slice:":1" }}</div>
+                {% endif %}
+                <span class="team-name">{{ team.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="welcome-card login-card">
+        <h2>Skráðu þig inn</h2>
+        <form method="post" action="/login/">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username">Notandanafn</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Lykilorð</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn welcome-btn">Skrá inn</button>
+                <a href="/register/" class="btn welcome-btn secondary">Nýskráning</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Team selection functionality
+        const teamItems = document.querySelectorAll('.team-selection-item');
+        const selectedTeamInput = document.getElementById('selected-team-id');
+        const bodyElement = document.body;
+        
+        teamItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                teamItems.forEach(el => el.classList.remove('active'));
+                
+                // Add active class to selected item
+                this.classList.add('active');
+                
+                // Store selected team ID in form
+                selectedTeamInput.value = this.dataset.teamId;
+                
+                // Apply team colors to the page
+                applyTeamColors(this.dataset.teamColors);
+                
+                // Store team selection in localStorage
+                localStorage.setItem('selectedTeam', this.dataset.teamId);
+                localStorage.setItem('teamColors', this.dataset.teamColors);
+            });
+        });
+        
+        // Function to apply team colors
+        function applyTeamColors(teamName) {
+            // Remove all previous team color classes
+            const classesToRemove = Array.from(bodyElement.classList).filter(c => c.startsWith('team-color-'));
+            classesToRemove.forEach(c => bodyElement.classList.remove(c));
+            
+            // Add new team color class
+            bodyElement.classList.add('team-color-' + teamName.replace(/\s+/g, '-').toLowerCase());
+        }
+        
+        // Check for previously selected team
+        const savedTeam = localStorage.getItem('selectedTeam');
+        const savedColors = localStorage.getItem('teamColors');
+        if (savedTeam && savedColors) {
+            // Find and select the saved team
+            const savedTeamEl = document.querySelector(`.team-selection-item[data-team-id="${savedTeam}"]`);
+            if (savedTeamEl) {
+                savedTeamEl.classList.add('active');
+                selectedTeamInput.value = savedTeam;
+                applyTeamColors(savedColors);
+            }
+        }
+    });
+</script>
+{% endblock %}

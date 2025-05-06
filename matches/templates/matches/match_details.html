@@ -1,0 +1,11 @@
+{% extends "matches/base.html" %}
+{% block content %}
+    <div class="container">
+        <h2>{{ match.home_team }} vs {{ match.away_team }}</h2>
+        <p>Date: {{ match.match_date }}</p>
+        <p>Venue: {{ match.venue }}</p>
+        <h3>Gameday Text:</h3>
+        <p>{{ gameday_text }}</p>
+        <a href="{% url 'home' %}">Back to Calendar</a>
+    </div>
+{% endblock %}

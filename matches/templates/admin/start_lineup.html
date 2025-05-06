@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Start Lineup Selection</h1>
+
+{% if match %}
+<p>Match: {{ match.home_team }} vs {{ match.away_team }}</p>
+<p>Tournament: {{ match.tournament.name }}</p>
+<p>Date: {{ match.match_date }}</p>
+{% else %}
+<p>Game: {{ game.home_team }} vs {{ game.away_team }}</p>
+<p>Confederation: {{ game.confederation }}</p>
+<p>Date: {{ game.match_date }}</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="default">Continue to Lineup Selection</button>
+</form>
+<a class="button" href="{% url 'admin:matches_match_changelist' %}">Back to Matches</a>
+{% endblock %}

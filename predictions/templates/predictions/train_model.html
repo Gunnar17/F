@@ -1,0 +1,64 @@
+{% extends 'predictions/base.html' %}
+
+{% block content %}
+<div class="train-model-container">
+    <div class="header">
+        <h1>Train New Prediction Model</h1>
+        <p class="info-text">This will create a new machine learning model using your historical match data. This process may take a minute or two.</p>
+    </div>
+
+    <div class="training-form">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                <div class="form-error">{{ form.name.errors }}</div>
+                {% endif %}
+                <div class="form-help">{{ form.name.help_text }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.model_type.id_for_label }}">{{ form.model_type.label }}</label>
+                {{ form.model_type }}
+                {% if form.model_type.errors %}
+                <div class="form-error">{{ form.model_type.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group checkbox">
+                {{ form.set_as_active }}
+                <label for="{{ form.set_as_active.id_for_label }}">{{ form.set_as_active.label }}</label>
+                {% if form.set_as_active.errors %}
+                <div class="form-error">{{ form.set_as_active.errors }}</div>
+                {% endif %}
+                <div class="form-help">{{ form.set_as_active.help_text }}</div>
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn btn-primary">Train Model</button>
+                <a href="{% url 'predictions_home' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="training-info">
+        <h3>About Model Training</h3>
+        <ul>
+            <li>Training uses your historical game data to learn patterns.</li>
+            <li>The more games in your database, the better the predictions will be.</li>
+            <li>Logistic Regression is faster but less accurate for complex patterns.</li>
+            <li>Random Forest can capture more complex patterns but requires more data.</li>
+            <li>Training will use these features:
+                <ul>
+                    <li>Team form (win rate, goals scored, goals conceded)</li>
+                    <li>Head-to-head history</li>
+                    <li>Home/away performance</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

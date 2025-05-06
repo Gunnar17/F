@@ -1,0 +1,99 @@
+{% extends 'predictions/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="predictions-container">
+    <div class="predictions-header">
+        <h1>Match Prediction System</h1>
+        <div class="actions">
+            <a href="{% url 'new_prediction' %}" class="btn btn-primary">New Prediction</a>
+            {% if user.is_staff %}
+            <a href="{% url 'train_model' %}" class="btn btn-secondary">Train New Model</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if active_model %}
+    <div class="active-model-info">
+        <h2>Current Prediction Model</h2>
+        <div class="model-card">
+            <div class="model-details">
+                <h3>{{ active_model.name }}</h3>
+                <p><strong>Type:</strong> {{ active_model.get_model_type_display }}</p>
+                <p><strong>Accuracy:</strong> {{ active_model.accuracy|floatformat:2 }}</p>
+                <p><strong>Created:</strong> {{ active_model.created_at|date:"M d, Y" }}</p>
+            </div>
+            <div class="model-actions">
+                <a href="{% url 'model_detail' active_model.id %}" class="btn btn-info">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="no-model-warning">
+        <p>No active prediction model is available. {% if user.is_staff %}Please <a href="{% url 'train_model' %}">train a new model</a>.{% endif %}</p>
+    </div>
+    {% endif %}
+
+    <div class="predictions-grid">
+        <div class="upcoming-games">
+            <h2>Upcoming Games</h2>
+            {% if upcoming_games %}
+            <div class="game-list">
+                {% for game in upcoming_games %}
+                <div class="game-card">
+                    <div class="game-teams">
+                        <span class="home-team">{{ game.home_team }}</span>
+                        <span class="vs">vs</span>
+                        <span class="away-team">{{ game.away_team }}</span>
+                    </div>
+                    <div class="game-details">
+                        <span class="game-date">{{ game.match_date|date:"M d, Y" }}</span>
+                        <span class="game-time">{{ game.match_date|time:"H:i" }}</span>
+                    </div>
+                    <div class="game-actions">
+                        <a href="{% url 'new_prediction' %}?game={{ game.id }}" class="btn btn-sm btn-primary">Predict</a>
+                        <a href="{% url 'game_details' game.id %}" class="btn btn-sm btn-secondary">Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No upcoming games scheduled.</p>
+            {% endif %}
+        </div>
+
+        <div class="recent-predictions">
+            <h2>Recent Predictions</h2>
+            {% if recent_predictions %}
+            <div class="prediction-list">
+                {% for prediction in recent_predictions %}
+                <div class="prediction-card">
+                    <div class="prediction-teams">
+<span class="home-team">{{ prediction.game.home_team }}</span>
+                        <span class="vs">vs</span>
+                        <span class="away-team">{{ prediction.game.away_team }}</span>
+                    </div>
+                    <div class="prediction-result">
+                        <div class="result-bar">
+                            <div class="home-win" style="width: {{ prediction.home_win_probability|floatformat:0 }}%;" title="Home win: {{ prediction.home_win_probability|floatformat:1 }}%"></div>
+                            <div class="draw" style="width: {{ prediction.draw_probability|floatformat:0 }}%;" title="Draw: {{ prediction.draw_probability|floatformat:1 }}%"></div>
+                            <div class="away-win" style="width: {{ prediction.away_win_probability|floatformat:0 }}%;" title="Away win: {{ prediction.away_win_probability|floatformat:1 }}%"></div>
+                        </div>
+                        <div class="predicted-score">
+                            Predicted: {{ prediction.predicted_home_goals|floatformat:1 }} - {{ prediction.predicted_away_goals|floatformat:1 }}
+                        </div>
+                    </div>
+                    <div class="prediction-meta">
+                        <span class="prediction-date">{{ prediction.created_at|date:"M d, Y" }}</span>
+                        <a href="{% url 'prediction_detail' prediction.id %}" class="btn btn-sm btn-info">Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No predictions have been made yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

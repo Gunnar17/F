@@ -1,0 +1,208 @@
+{% extends "matches/base.html" %}
+
+{% block title %}{{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">{{ team.name }}</h1>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Tournament Standings</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Tournament</th>
+                                    <th class="text-center">P</th>
+                                    <th class="text-center">W</th>
+                                    <th class="text-center">D</th>
+                                    <th class="text-center">L</th>
+                                    <th class="text-center">GF</th>
+                                    <th class="text-center">GA</th>
+                                    <th class="text-center">GD</th>
+                                    <th class="text-center">Pts</th>
+                                    <th class="text-center">Position</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for standing in standings %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'football:tournament_detail' standing.tournament.tournament_number %}" class="text-decoration-none">
+                                            {{ standing.tournament.name }}
+                                        </a>
+                                    </td>
+                                    <td class="text-center">{{ standing.matches_played }}</td>
+                                    <td class="text-center">{{ standing.matches_won }}</td>
+                                    <td class="text-center">{{ standing.matches_drawn }}</td>
+                                    <td class="text-center">{{ standing.matches_lost }}</td>
+                                    <td class="text-center">{{ standing.goals_scored }}</td>
+                                    <td class="text-center">{{ standing.goals_conceded }}</td>
+                                    <td class="text-center">{{ standing.goal_difference }}</td>
+                                    <td class="text-center fw-bold">{{ standing.points }}</td>
+                                    <td class="text-center">
+                                        {% if standing.position == 1 %}
+                                            <span class="badge bg-warning text-dark">1st</span>
+                                        {% elif standing.position == 2 %}
+                                            <span class="badge bg-secondary">2nd</span>
+                                        {% elif standing.position == 3 %}
+                                            <span class="badge bg-danger">3rd</span>
+                                        {% elif standing.position <= 4 %}
+                                            <span class="badge bg-success">{{ standing.position }}th</span>
+                                        {% elif standing.position >= standing.tournament.teams_count|default:0|add:"-3" %}
+                                            <span class="badge bg-danger">{{ standing.position }}th</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">{{ standing.position }}th</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center py-3">No tournament standings available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h2 class="h5 mb-0">Recent Results</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for match in recent_matches %}
+                    <div class="list-group-item">
+                        <div class="small text-muted">{{ match.match_date|date:"D, d M Y" }} • {{ match.tournament.name }}</div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <div class="text-end me-2 fw-medium" style="width: 40%;">
+                                {% if match.home_team == team %}
+                                <span class="fw-bold">{{ match.home_team.name }}</span>
+                                {% else %}
+                                <a href="{% url 'football:team_detail' match.home_team.team_number %}" class="text-decoration-none">
+                                    {{ match.home_team.name }}
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex align-items-center" style="min-width: 70px;">
+                                <span class="badge bg-dark py-2 px-2 mx-1">{{ match.home_score }}</span>
+                                <span>-</span>
+                                <span class="badge bg-dark py-2 px-2 mx-1">{{ match.away_score }}</span>
+                            </div>
+                            <div class="ms-2 fw-medium" style="width: 40%;">
+                                {% if match.away_team == team %}
+                                <span class="fw-bold">{{ match.away_team.name }}</span>
+                                {% else %}
+                                <a href="{% url 'football:team_detail' match.away_team.team_number %}" class="text-decoration-none">
+                                    {{ match.away_team.name }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-center mt-1">
+                            <a href="{% url 'football:match_detail' match.match_number %}" class="small text-decoration-none">
+                                Match details »
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center py-3">
+                        No recent match results available
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0">Upcoming Matches</h2>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for match in upcoming_matches %}
+                    <li class="list-group-item">
+                        <div class="small text-muted">{{ match.match_date|date:"D, d M Y H:i" }}</div>
+                        <div class="small text-muted">{{ match.tournament.name }}</div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <div class="text-end me-2 fw-medium" style="width: 40%;">
+                                {% if match.home_team == team %}
+                                <span class="fw-bold">{{ match.home_team.name }}</span>
+                                {% else %}
+                                <a href="{% url 'football:team_detail' match.home_team.team_number %}" class="text-decoration-none">
+                                    {{ match.home_team.name }}
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="badge bg-secondary">vs</div>
+                            <div class="ms-2 fw-medium" style="width: 40%;">
+                                {% if match.away_team == team %}
+                                <span class="fw-bold">{{ match.away_team.name }}</span>
+                                {% else %}
+                                <a href="{% url 'football:team_detail' match.away_team.team_number %}" class="text-decoration-none">
+                                    {{ match.away_team.name }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-center mt-1">
+                            <a href="{% url 'football:match_detail' match.match_number %}" class="small text-decoration-none">
+                                Match details »
+                            </a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center py-3">
+                        No upcoming matches
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h2 class="h5 mb-0">Team Information</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <th>Team ID:</th>
+                            <td>{{ team.team_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Matches:</th>
+                            <td>{{ team_stats.total_matches|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Wins:</th>
+                            <td>{{ team_stats.total_wins|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Draws:</th>
+                            <td>{{ team_stats.total_draws|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Losses:</th>
+                            <td>{{ team_stats.total_losses|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Goals Scored:</th>
+                            <td>{{ team_stats.total_goals_scored|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Goals Conceded:</th>
+                            <td>{{ team_stats.total_goals_conceded|default:"N/A" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
